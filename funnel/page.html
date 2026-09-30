@@ -1,0 +1,393 @@
+<title>Struggle92 Funnels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow sales column; the video sits above the fold, a sticky CTA follows on phones */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #131a2a;
+  --muted: #566078;
+  --line: #dfe3ea;
+  --accent: #e2550f;
+  --accent-ink: #ffffff;
+  --accent-soft: #fde9dc;
+  --good: #1d7a4f;
+  --player: #131a2a;
+  --player-ink: #f6f7f9;
+  --f-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1420; --surface: #171e2d; --ink: #eef1f6; --muted: #9aa4ba; --line: #2a3346;
+  --accent: #ff7a33; --accent-ink: #1a0d04; --accent-soft: #3a2415; --good: #4cc38a;
+  --player: #05080e; --player-ink: #eef1f6; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1420; --surface: #171e2d; --ink: #eef1f6; --muted: #9aa4ba; --line: #2a3346;
+  --accent: #ff7a33; --accent-ink: #1a0d04; --accent-soft: #3a2415; --good: #4cc38a;
+  --player: #05080e; --player-ink: #eef1f6; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--f-body); margin: 0; padding-inline: 16px; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 120px; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.08; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 6vw, 3.1rem); font-weight: 800; }
+h2 { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font: 500 0.75rem/1 var(--f-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); }
+.muted { color: var(--muted); }
+
+/* offer switcher (owner preview only) */
+.switch { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px; border: 1px dashed var(--line); border-radius: var(--r); font-size: 0.85rem; }
+.switch span { font: 500 0.7rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-inline: 6px; }
+.switch button { font: 600 0.85rem var(--f-body); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.hero { display: grid; gap: 18px; }
+.hero .sub { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+
+/* video sales letter player */
+.player { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: var(--r); background: var(--player); color: var(--player-ink); overflow: hidden; display: grid; place-items: center; text-decoration: none; }
+.player::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,.035) 22px 23px); }
+.player .play { position: relative; width: 78px; height: 78px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; transition: transform .2s ease; }
+.player .play::after { content: ""; margin-left: 6px; border-style: solid; border-width: 14px 0 14px 22px; border-color: transparent transparent transparent var(--accent-ink); }
+.player:hover .play, .player:focus-visible .play { transform: scale(1.07); }
+.player .cap { position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; justify-content: space-between; gap: 12px; font: 500 0.78rem var(--f-mono); opacity: .85; }
+.player .hook { position: absolute; top: 16px; left: 16px; right: 16px; font: 700 clamp(1rem, 3vw, 1.35rem)/1.2 var(--f-display); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: 700 1.05rem var(--f-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: var(--r); padding: 16px 24px; cursor: pointer; text-decoration: none; width: 100%; }
+.btn:hover { filter: brightness(1.06); }
+.btn:focus-visible, .switch button:focus-visible, input:focus-visible, select:focus-visible, .player:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.fine { font-size: 0.85rem; color: var(--muted); text-align: center; }
+
+.list { display: grid; gap: 14px; list-style: none; margin: 0; padding: 0; }
+.list li { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start; }
+.list li::before { content: ""; width: 20px; height: 20px; margin-top: 3px; border-radius: 50%; }
+.list li::before { border: 2px solid var(--good); box-shadow: inset 0 0 0 4px var(--bg), inset 0 0 0 10px var(--good); }
+.list b { font-weight: 600; }
+
+section { display: grid; gap: 22px; }
+.steps { display: grid; gap: 12px; counter-reset: s; }
+.step { display: grid; grid-template-columns: auto 1fr; gap: 16px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.step::before { counter-increment: s; content: counter(s, decimal-leading-zero); font: 500 0.85rem var(--f-mono); color: var(--accent); padding-top: 3px; }
+.step div { display: grid; gap: 4px; min-width: 0; }
+
+.proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.quote { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 10px; color: var(--muted); font-size: 0.95rem; }
+.quote b { font: 500 0.72rem var(--f-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--accent); }
+
+.offerbox { background: var(--surface); border: 2px solid var(--ink); border-radius: calc(var(--r) + 4px); padding: clamp(20px, 5vw, 32px); display: grid; gap: 20px; }
+.price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.price strong { font: 800 clamp(2.4rem, 8vw, 3.2rem)/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.price span { color: var(--muted); }
+.stack { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.stack li { display: flex; justify-content: space-between; gap: 12px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.stack li em { font: 500 0.85rem var(--f-mono); font-style: normal; color: var(--muted); white-space: nowrap; }
+
+form { display: grid; gap: 12px; }
+.field { display: grid; gap: 6px; }
+label { font-weight: 600; font-size: 0.9rem; }
+input, select { font: 400 1rem var(--f-body); padding: 13px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; }
+.err { color: var(--accent); font-size: 0.85rem; min-height: 1.2em; }
+.thanks { background: var(--accent-soft); border-radius: var(--r); padding: 22px; display: grid; gap: 10px; }
+
+.faq { display: grid; gap: 8px; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 18px; }
+summary { font-weight: 600; cursor: pointer; }
+details p { margin-top: 10px; color: var(--muted); }
+
+footer { display: grid; gap: 10px; font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 22px; }
+
+.sticky { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-top: 1px solid var(--line); display: none; }
+@media (max-width: 640px) { .sticky { display: block; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <nav class="switch" id="switch" aria-label="Preview offer"><span>Preview offer</span></nav>
+
+  <header class="hero">
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 id="headline"></h1>
+    <p class="sub" id="sub"></p>
+    <a class="player" id="player" href="#optin" aria-label="Play the video">
+      <p class="hook" id="hook"></p>
+      <span class="play" aria-hidden="true"></span>
+      <p class="cap"><span id="vidLabel"></span><span id="vidTime"></span></p>
+    </a>
+    <a class="btn" href="#optin" id="ctaTop"></a>
+    <p class="fine" id="riskTop"></p>
+  </header>
+
+  <section>
+    <p class="eyebrow">What you get</p>
+    <h2 id="benefitsTitle"></h2>
+    <ul class="list" id="benefits"></ul>
+  </section>
+
+  <section>
+    <p class="eyebrow">How it works</p>
+    <h2 id="stepsTitle"></h2>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Proof</p>
+    <h2>What people say after working with us</h2>
+    <div class="proof" id="proof"></div>
+  </section>
+
+  <section id="optin">
+    <div class="offerbox">
+      <div>
+        <p class="eyebrow" id="offerLabel"></p>
+        <div class="price"><strong id="price"></strong><span id="priceNote"></span></div>
+      </div>
+      <ul class="stack" id="stack"></ul>
+      <form id="form" novalidate>
+        <div id="fields" style="display:grid;gap:12px"></div>
+        <p class="err" id="err" role="alert"></p>
+        <button class="btn" type="submit" id="submit"></button>
+        <p class="fine" id="risk"></p>
+      </form>
+      <div class="thanks" id="thanks" hidden>
+        <h3 id="thanksTitle"></h3>
+        <p id="thanksBody"></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Questions</p>
+    <h2>Before you decide</h2>
+    <div class="faq" id="faq"></div>
+  </section>
+
+  <footer>
+    <p id="disclosure"></p>
+    <p id="brandLine"></p>
+  </footer>
+</div>
+
+<div class="sticky"><a class="btn" href="#optin" id="ctaSticky"></a></div>
+
+<script>
+/* ============ EDIT HERE ============
+   Each offer is one landing page. Open a specific one with #service, #digital, #affiliate or #local.
+   WEBHOOK_URL: paste a Zapier "Catch Hook" URL to send every lead to Gmail, Sheets or your CRM. */
+const CONFIG = {
+  BRAND: "Struggle92 Media",
+  CONTACT: "weaver71992@gmail.com",
+  WEBHOOK_URL: "",
+  SHOW_SWITCHER: true   // set false before you share a live link
+};
+
+const OFFERS = {
+  service: {
+    tab: "Service",
+    eyebrow: "For local businesses",
+    headline: "30 days of short videos for your business, filmed on your phone and edited by us",
+    sub: "You send us 20 minutes of raw clips each week. We turn them into Reels, TikToks and Shorts that bring calls in, and we post them for you.",
+    hook: "Why the shop down the street gets calls from TikTok and you don't",
+    vidLabel: "Watch first", vidTime: "4 min",
+    cta: "Get my free content audit",
+    riskTop: "Free 15-minute audit. No card, no contract.",
+    benefitsTitle: "Everything you need to show up every day",
+    benefits: [
+      ["12 edited short videos a month", "captions, hooks and music, sized for Reels, TikTok and Shorts"],
+      ["Posting handled for you", "scheduled on Facebook, Instagram, TikTok and YouTube at the best times"],
+      ["A monthly report in plain English", "views, profile visits, and calls or messages that came from the videos"],
+      ["A shot list every Monday", "so you know exactly what to film, even if you hate being on camera"]
+    ],
+    stepsTitle: "Three steps, about 20 minutes a week from you",
+    steps: [
+      ["Free audit call", "We look at your pages and competitors and show you the three videos we'd make first."],
+      ["You film, we edit", "Record from our shot list, upload to a shared folder, and we edit within 48 hours."],
+      ["We post and report", "Videos go out on schedule. At month end you see what worked and we double down on it."]
+    ],
+    proof: 3,
+    offerLabel: "Monthly content package",
+    price: "$497", priceNote: "/ month, cancel anytime",
+    stack: [["12 short-form videos", "$600 value"], ["Posting on 4 platforms", "$200 value"], ["Weekly shot list", "$100 value"], ["Monthly results report", "included"]],
+    fields: [["name", "Your name", "text"], ["business", "Business name", "text"], ["email", "Email", "email"], ["phone", "Phone (for the audit call)", "tel"]],
+    submit: "Book my free audit",
+    risk: "We take 5 new businesses a month so every client gets fast turnarounds.",
+    thanksTitle: "You're in. Check your email.",
+    thanksBody: "We'll reply within one business day with two audit times. Reply to that email with a link to your Facebook or Instagram page so we can prepare.",
+    faq: [
+      ["What if I don't want to be on camera?", "Many clients never show their face. We use hands-on work, before-and-after shots, voiceover and text on screen."],
+      ["Do I sign a contract?", "No. You pay month to month and can cancel before the next billing date."],
+      ["How fast will I see results?", "Most pages see higher views in the first two weeks. Calls and bookings usually take 30 to 60 days of consistent posting. We don't promise specific numbers."]
+    ],
+    disclosure: "Results depend on your business, market and how consistently content is filmed. We don't guarantee revenue."
+  },
+
+  digital: {
+    tab: "Digital product",
+    eyebrow: "Faceless Shorts Playbook",
+    headline: "Post 30 faceless Shorts in 30 days without showing your face or buying gear",
+    sub: "A step-by-step playbook with 60 hook templates, a free-tools editing workflow, and a posting calendar you can copy into your phone tonight.",
+    hook: "The 3-second hook formula behind most viral faceless Shorts",
+    vidLabel: "Free training", vidTime: "7 min",
+    cta: "Get the playbook",
+    riskTop: "Instant download. 30-day money-back guarantee.",
+    benefitsTitle: "What's inside",
+    benefits: [
+      ["The 30-day posting calendar", "one video idea per day across 5 proven faceless formats"],
+      ["60 fill-in-the-blank hooks", "the first lines that stop the scroll, sorted by niche"],
+      ["Free-tools editing workflow", "CapCut and Canva settings so each Short takes under 30 minutes"],
+      ["Monetization map", "what YouTube, TikTok and affiliate programs require before they pay you"]
+    ],
+    stepsTitle: "Start today",
+    steps: [
+      ["Pick your niche", "Use the niche worksheet to choose a topic you can post about for 90 days."],
+      ["Batch 7 videos", "Follow the workflow to script and edit your first week in one afternoon."],
+      ["Post daily and review", "Use the calendar and the 5-minute weekly review to see what to repeat."]
+    ],
+    proof: 3,
+    offerLabel: "One-time payment",
+    price: "$27", priceNote: "lifetime access and free updates",
+    stack: [["Faceless Shorts Playbook (PDF)", "core"], ["60-hook swipe file", "bonus"], ["30-day Notion calendar", "bonus"], ["Monetization checklist", "bonus"]],
+    fields: [["name", "First name", "text"], ["email", "Email for the download link", "email"]],
+    submit: "Send me the playbook",
+    risk: "Not happy within 30 days? Reply to your receipt email for a full refund.",
+    thanksTitle: "Your download is on the way.",
+    thanksBody: "Check your inbox for the checkout link and download. Not there in 5 minutes? Look in Promotions or Spam.",
+    faq: [
+      ["Will I make money with this?", "This playbook teaches a content system. Most people who post Shorts earn nothing at first. Earnings depend on your niche, consistency and platform rules. We make no income guarantee."],
+      ["Do I need to buy software?", "No. Everything uses free versions of CapCut and Canva on your phone."],
+      ["Is this a course?", "It's a playbook you can read in one sitting, plus templates. No upsells inside."]
+    ],
+    disclosure: "Earnings disclaimer: we make no claims about income. Any examples show what's possible, not what's typical. Most people who try short-form content earn little or nothing."
+  },
+
+  affiliate: {
+    tab: "Affiliate",
+    eyebrow: "The tool I use every day",
+    headline: "How I design a week of Shorts thumbnails and posts in one hour with Canva Pro",
+    sub: "A short walkthrough of my exact setup: brand kit, templates, and the Magic Resize trick that turns one design into every platform size.",
+    hook: "One design, six platforms, about 90 seconds",
+    vidLabel: "Walkthrough", vidTime: "5 min",
+    cta: "Try Canva Pro free",
+    riskTop: "Canva offers a free Pro trial. Cancel before it ends and you pay nothing.",
+    benefitsTitle: "Why I pay for Pro",
+    benefits: [
+      ["Magic Resize", "one click turns a post into a Story, Short cover, Pin and thumbnail"],
+      ["Brand Kit", "your fonts, colors and logo loaded into every template"],
+      ["Background remover", "clean product and headshot cutouts in one tap"],
+      ["Content planner", "schedule posts to Facebook, Instagram and more from inside Canva"]
+    ],
+    stepsTitle: "My one-hour weekly routine",
+    steps: [
+      ["Duplicate last week's template set", "Seven post designs already sized and branded."],
+      ["Swap text and images", "Drop in this week's topics and photos."],
+      ["Resize and schedule", "Magic Resize for each platform, then schedule from the content planner."]
+    ],
+    proof: 2,
+    offerLabel: "Canva Pro free trial",
+    price: "$0", priceNote: "during the trial, then Canva's standard price",
+    stack: [["Full Pro template library", "included"], ["Magic Resize and background remover", "included"], ["My free template pack", "bonus from me"]],
+    fields: [["name", "First name", "text"], ["email", "Email for my template pack", "email"]],
+    submit: "Send my templates and open the trial",
+    risk: "You'll get my free template pack by email, then the Canva trial page opens.",
+    thanksTitle: "Templates sent.",
+    thanksBody: "Your template pack is on its way. Start your Canva Pro trial here: ",
+    afterLink: "https://www.canva.com/pro/",
+    faq: [
+      ["Do you earn from this?", "Yes. If you sign up through my link I may earn a commission at no extra cost to you."],
+      ["Can I cancel?", "Yes. Cancel from your Canva account settings before the trial ends and you won't be charged."],
+      ["Is Canva free already?", "Canva has a free plan. Pro adds the resize, brand kit and background tools shown in the video."]
+    ],
+    disclosure: "Affiliate disclosure: this page contains affiliate links. If you buy through them I may earn a commission at no extra cost to you. Not affiliated with or endorsed by Canva beyond its public affiliate program."
+  },
+
+  local: {
+    tab: "Local business",
+    eyebrow: "Mobile detailing that comes to you",
+    headline: "Your car detailed in your driveway while you work, in about 3 hours",
+    sub: "Interior deep clean, hand wash and wax. We bring our own water and power. You get a text with before-and-after photos when it's done.",
+    hook: "What 3 years of kids, coffee and dog hair looks like after one visit",
+    vidLabel: "See a real detail", vidTime: "90 sec",
+    cta: "Get my free quote",
+    riskTop: "Quote in under an hour during business hours.",
+    benefitsTitle: "Why people switch to us",
+    benefits: [
+      ["We come to you", "home or office, with our own water and power"],
+      ["Upfront pricing", "you see the price before we book, by vehicle size"],
+      ["Photo proof", "before and after photos texted when we're done"],
+      ["Re-clean promise", "missed a spot? We come back within 48 hours for free"]
+    ],
+    stepsTitle: "Booked in two minutes",
+    steps: [
+      ["Request a quote", "Tell us the vehicle and what it needs."],
+      ["Pick a time", "We text back a price and open slots."],
+      ["We show up", "Keep working. We text you when it's done."]
+    ],
+    proof: 3,
+    offerLabel: "Full detail",
+    price: "From $149", priceNote: "sedans; SUVs and trucks from $189",
+    stack: [["Interior vacuum and shampoo", "included"], ["Hand wash and spray wax", "included"], ["Tire shine and glass", "included"], ["Pet hair removal", "+$30"]],
+    fields: [["name", "Your name", "text"], ["phone", "Mobile number (we text the quote)", "tel"], ["vehicle", "Year, make and model", "text"], ["zip", "ZIP code", "text"]],
+    submit: "Text me a quote",
+    risk: "No spam. We only text about your quote and appointment.",
+    thanksTitle: "Got it. Watch for our text.",
+    thanksBody: "We'll text your quote and two open times shortly. Replying STOP ends texts at any time.",
+    faq: [
+      ["Do you need my water or power?", "No. The van carries both."],
+      ["How long does it take?", "About 2.5 to 3.5 hours depending on size and condition."],
+      ["How do I pay?", "Card, Cash App or cash when the job is done. Nothing up front."]
+    ],
+    disclosure: "Prices are starting prices and vary by vehicle condition. Service area and hours listed when we send your quote."
+  }
+};
+/* ============ END EDIT ============ */
+
+const $ = id => document.getElementById(id);
+let current = "service";
+
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+
+function render(key) {
+  const o = OFFERS[key] || OFFERS.service; current = OFFERS[key] ? key : "service";
+  document.querySelectorAll("#switch button").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === current));
+  ["eyebrow","headline","sub","hook","vidLabel","vidTime","riskTop","benefitsTitle","stepsTitle","offerLabel","price","priceNote","risk","thanksTitle","disclosure"].forEach(k => $(k).textContent = o[k] || "");
+  $("ctaTop").textContent = o.cta; $("ctaSticky").textContent = o.cta; $("submit").textContent = o.submit;
+
+  $("benefits").replaceChildren(...o.benefits.map(([b, t]) => { const li = el("li"); const d = el("div"); d.append(el("b", "", b), document.createTextNode(": " + t)); li.append(d); return li; }));
+  $("steps").replaceChildren(...o.steps.map(([h, t]) => { const s = el("div", "step"); const d = el("div"); d.append(el("h3", "", h), el("p", "muted", t)); s.append(d); return s; }));
+  $("proof").replaceChildren(...Array.from({ length: o.proof }, (_, i) => { const q = el("div", "quote"); q.append(el("b", "", "Slot " + (i + 1)), el("p", "", "Add a real customer quote, first name and photo here. Only use quotes from real customers who said yes.")); return q; }));
+  $("stack").replaceChildren(...o.stack.map(([a, b]) => { const li = el("li"); li.append(el("span", "", a), el("em", "", b)); return li; }));
+  $("fields").replaceChildren(...o.fields.map(([id, lab, type]) => { const f = el("div", "field"); const l = el("label", "", lab); l.htmlFor = "f_" + id; const i = el("input"); i.id = "f_" + id; i.name = id; i.type = type; i.required = true; i.autocomplete = { email: "email", name: "given-name", phone: "tel", zip: "postal-code" }[id] || "off"; f.append(l, i); return f; }));
+  $("faq").replaceChildren(...o.faq.map(([q, a]) => { const d = el("details"); d.append(el("summary", "", q), el("p", "", a)); return d; }));
+  $("brandLine").textContent = "© " + new Date().getFullYear() + " " + CONFIG.BRAND + " · Contact: " + CONFIG.CONTACT;
+
+  $("form").hidden = false; $("thanks").hidden = true; $("err").textContent = "";
+}
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const missing = OFFERS[current].fields.find(([id]) => !String(data[id] || "").trim());
+  if (missing) { $("err").textContent = "Please fill in " + missing[1].toLowerCase() + "."; return; }
+  if (data.email && !/^\S+@\S+\.\S+$/.test(data.email)) { $("err").textContent = "That email looks incomplete. Check for a typo."; return; }
+  if (data.phone && data.phone.replace(/\D/g, "").length < 10) { $("err").textContent = "Enter a 10-digit phone number."; return; }
+  const lead = { ...data, offer: current, submittedAt: new Date().toISOString() };
+  try { const all = JSON.parse(localStorage.getItem("leads") || "[]"); all.push(lead); localStorage.setItem("leads", JSON.stringify(all)); } catch (_) {}
+  if (CONFIG.WEBHOOK_URL) { try { await fetch(CONFIG.WEBHOOK_URL, { method: "POST", body: JSON.stringify(lead) }); } catch (_) {} }
+  const o = OFFERS[current];
+  $("thanksBody").textContent = o.thanksBody;
+  if (o.afterLink) { const a = el("a", "", "open the trial page"); a.href = o.afterLink; a.target = "_blank"; a.rel = "noopener sponsored"; $("thanksBody").append(a, document.createTextNode(".")); }
+  $("form").hidden = true; $("thanks").hidden = false;
+});
+
+if (CONFIG.SHOW_SWITCHER) {
+  Object.entries(OFFERS).forEach(([k, o]) => { const b = el("button", "", o.tab); b.type = "button"; b.dataset.k = k; b.onclick = () => { history.replaceState(null, "", "#" + k); render(k); }; $("switch").append(b); });
+} else { $("switch").hidden = true; }
+
+render((location.hash || "").replace("#", "") || "service");
+window.addEventListener("hashchange", () => { const k = location.hash.slice(1); if (OFFERS[k]) render(k); });
+</script>
