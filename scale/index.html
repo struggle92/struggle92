@@ -97,6 +97,27 @@ h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color:
     <div class="seg" id="units" role="group" aria-label="Unit"></div>
   </section>
 
+  <section class="panel" aria-label="Spoons to grams">
+    <h2>Spoons to grams</h2>
+    <div class="row">
+      <label for="spice">Spice
+        <select id="spice"></select>
+      </label>
+      <label for="spoonAmt">Amount
+        <input id="spoonAmt" type="number" inputmode="decimal" step="0.25" min="0" value="1">
+      </label>
+      <label for="spoonUnit">Measure
+        <select id="spoonUnit"><option value="1">tsp</option><option value="3">tbsp</option><option value="0.5">½ tsp</option><option value="0.25">¼ tsp</option><option value="0.125">⅛ tsp (pinch)</option></select>
+      </label>
+    </div>
+    <div class="row" style="align-items:center">
+      <div><div class="note">Approximate weight, level spoon</div><div class="total" id="spoonG">0.00 g</div></div>
+      <button id="bSpoonSend" style="flex:0 0 auto">Put on display</button>
+    </div>
+    <p class="note" id="spoonBack">&nbsp;</p>
+    <p class="note">Spoon weights vary about 15% with grind and how tightly you pack. For exact 0.01 g amounts use a pocket scale and Type it.</p>
+  </section>
+
   <section class="panel" aria-label="Input source">
     <h2>Input</h2>
     <div class="seg" id="srcSeg" role="group" aria-label="Input source">
@@ -244,6 +265,7 @@ h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color:
     const ppg = parseFloat($('ppg').value) || 0;
     $('total').textContent = money(Math.max(0, n) * ppg);
     $('bHold').classList.toggle('on', S.hold);
+    if ($('spice').options.length) drawSpoon();
   }
 
   // units
@@ -366,9 +388,37 @@ h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color:
   $('bClearNo').onclick = () => { $('confirmClear').hidden = true };
   $('bClearYes').onclick = () => { S.log = []; store.set('log', []); $('confirmClear').hidden = true; drawLog() };
 
+  // spices: grams per level teaspoon (ground unless noted)
+  const SPICES = [
+    ['Allspice, ground', 1.9], ['Basil, dried', 0.7], ['Bay leaf, crushed', 0.6], ['Black pepper, ground', 2.3],
+    ['Cardamom, ground', 2.0], ['Cayenne', 1.8], ['Celery seed', 2.0], ['Chili powder', 2.7], ['Cinnamon, ground', 2.6],
+    ['Cloves, ground', 2.1], ['Coriander, ground', 1.8], ['Cumin, ground', 2.0], ['Cumin seed', 2.1], ['Curry powder', 2.0],
+    ['Dill, dried', 1.0], ['Fennel seed', 2.0], ['Garam masala', 2.0], ['Garlic powder', 3.1], ['Ginger, ground', 1.8],
+    ['Italian seasoning', 1.0], ['Mustard powder', 2.6], ['Nutmeg, ground', 2.2], ['Onion powder', 2.4], ['Oregano, dried', 1.0],
+    ['Paprika', 2.3], ['Parsley, dried', 0.5], ['Red pepper flakes', 1.8], ['Rosemary, dried', 1.2], ['Sage, rubbed', 0.7],
+    ['Salt, table', 6.0], ['Salt, kosher (Diamond Crystal)', 2.8], ['Salt, kosher (Morton)', 4.8], ['Sugar, white', 4.2],
+    ['Thyme, dried', 1.0], ['Turmeric, ground', 3.0],
+  ];
+  SPICES.forEach(([n, g], i) => { const o = document.createElement('option'); o.value = i; o.textContent = n; $('spice').append(o) });
+  $('spice').value = store.get('spice', 3);
+  const spoonGrams = () => SPICES[$('spice').value][1] * (parseFloat($('spoonAmt').value) || 0) * +$('spoonUnit').value;
+  function drawSpoon() {
+    store.set('spice', +$('spice').value);
+    $('spoonG').textContent = spoonGrams().toFixed(2) + ' g';
+    const n = net(), tsp = n / SPICES[$('spice').value][1];
+    $('spoonBack').textContent = n > 0.005 ? 'The ' + fmt(n, 'g') + ' g on the display is about ' + (tsp >= 3 ? (tsp / 3).toFixed(2) + ' tbsp' : tsp.toFixed(2) + ' tsp') + ' of ' + SPICES[$('spice').value][0].toLowerCase() + '.' : '\u00a0';
+  }
+  ['spice', 'spoonAmt', 'spoonUnit'].forEach(id => $(id).addEventListener('input', drawSpoon));
+  $('bSpoonSend').onclick = () => {
+    S.tare = 0; S.zero = 0; S.factor = 1; S.hold = false;
+    $('manualUnit').value = 'g'; $('manualVal').value = spoonGrams().toFixed(2);
+    $('recLabel').value = $('spoonAmt').value + ' ' + $('spoonUnit').selectedOptions[0].textContent + ' ' + SPICES[$('spice').value][0].toLowerCase();
+    setSrc('manual');
+  };
+
   // start: demo opens with a dish on the pan so the display shows something
   if (S.src === 'demo') demoTarget = 3.5;
-  setSrc(S.src); drawLog();
+  setSrc(S.src); drawLog(); drawSpoon();
 })();
 </script>
 </body></html>

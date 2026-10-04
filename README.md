@@ -27,6 +27,6 @@ Four video-sales-letter (VSL) funnels on one page, plus ready-to-post copy for e
 
 ## Pocket Gram Scale (`scale/index.html`)
 
-A 0.00 g scale display: zero, tare, hold, units (g, ct, oz, ozt, dwt, gr), price per gram, calibration and a reading log with CSV copy.
+A 0.00 g scale display: zero, tare, hold, units (g, ct, oz, ozt, dwt, gr), a spoons-to-grams spice converter, price per gram, calibration and a reading log with CSV copy.
 A phone has no weight sensor, so the numbers come from a real scale: type the reading from any 0.01 g pocket scale, or plug in a lab/jewelry balance with USB or RS-232 output (Chrome or Edge on a computer). Demo mode is simulated.
 Edit `scale/page.html`, then run `./build.sh`.
