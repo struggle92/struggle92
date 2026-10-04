@@ -1,0 +1,374 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"></head><body>
+<title>Pocket Gram Scale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@300;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one instrument column — display panel, key row, then price + log beneath. */
+:root {
+  --bg: #eef1f0; --panel: #ffffff; --ink: #18211f; --muted: #5d6b67; --line: #d3dbd8;
+  --lcd: #c9d8c2; --lcd-ink: #1d2a1a; --lcd-dim: #9fb197; --accent: #0f6e5c; --accent-ink: #ffffff;
+  --warn: #a35a00; --bad: #b3261e;
+  --f-digits: "Chivo Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1413; --panel: #171e1c; --ink: #e3ebe8; --muted: #93a39e; --line: #2a3532;
+  --lcd: #0b1a10; --lcd-ink: #7dffa8; --lcd-dim: #1f4a2c; --accent: #3fbf9f; --accent-ink: #06231c;
+  --warn: #f0a742; --bad: #ff8a80; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1413; --panel: #171e1c; --ink: #e3ebe8; --muted: #93a39e; --line: #2a3532;
+  --lcd: #0b1a10; --lcd-ink: #7dffa8; --lcd-dim: #1f4a2c; --accent: #3fbf9f; --accent-ink: #06231c;
+  --warn: #f0a742; --bad: #ff8a80; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); margin: 0 }
+.wrap { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px }
+h1 { font-size: 1rem; font-weight: 600; margin: 0; letter-spacing: .02em }
+header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap }
+.src { font-size: .8rem; color: var(--muted) }
+.src b { color: var(--ink); font-weight: 500 }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px }
+.lcd { background: var(--lcd); color: var(--lcd-ink); border-radius: 6px; padding: 14px 16px 10px; font-family: var(--f-digits);
+  box-shadow: inset 0 2px 6px rgb(0 0 0 / .18) }
+.lcd-top { display: flex; gap: 10px; font-size: .72rem; letter-spacing: .12em; text-transform: uppercase }
+.flag { color: var(--lcd-dim) } .flag.on { color: var(--lcd-ink) }
+.reading { display: flex; align-items: baseline; justify-content: flex-end; gap: 10px; min-width: 0 }
+#num { font-size: clamp(3rem, 16vw, 5.4rem); font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap }
+#unitLbl { font-size: 1.4rem; font-weight: 500 }
+.sub { font-size: .75rem; color: var(--lcd-ink); opacity: .75; text-align: right; font-variant-numeric: tabular-nums; min-height: 1.2em }
+
+.keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px }
+button, select, input { font: inherit; color: inherit }
+button { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 6px; cursor: pointer; font-weight: 500 }
+button:hover { border-color: var(--muted) }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+button.on { background: var(--ink); color: var(--bg); border-color: var(--ink) }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end }
+.row > * { flex: 1 1 120px; min-width: 0 }
+label { display: grid; gap: 4px; font-size: .75rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase }
+input, select { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 9px 10px; text-transform: none; letter-spacing: 0; font-size: .95rem }
+input[type=number] { font-family: var(--f-digits); font-variant-numeric: tabular-nums }
+h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0; font-weight: 600 }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden }
+.seg button { flex: 1; border: 0; border-radius: 0; background: transparent; padding: 8px 4px; font-size: .85rem }
+.seg button + button { border-left: 1px solid var(--line) }
+.seg button.on { background: var(--ink); color: var(--bg) }
+.note { font-size: .8rem; color: var(--muted); margin: 0 }
+.note.warn { color: var(--warn) } .note.bad { color: var(--bad) }
+.total { font-family: var(--f-digits); font-size: 1.6rem; font-variant-numeric: tabular-nums }
+
+.log { width: 100%; border-collapse: collapse; font-size: .85rem }
+.log th { text-align: left; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 500; padding: 4px 6px; border-bottom: 1px solid var(--line) }
+.log td { padding: 6px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums }
+.log td.n { font-family: var(--f-digits); text-align: right } .log th.n { text-align: right }
+.log td button { padding: 2px 8px; font-size: .75rem }
+.tablebox { overflow-x: auto }
+.empty { font-size: .85rem; color: var(--muted); padding: 8px 0 }
+[hidden] { display: none !important }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Pocket Gram Scale</h1>
+    <span class="src">Source: <b id="srcName">Demo</b></span>
+  </header>
+
+  <section class="panel" aria-label="Scale display">
+    <div class="lcd" role="status" aria-live="polite">
+      <div class="lcd-top">
+        <span class="flag" id="fStable">Stable</span>
+        <span class="flag" id="fTare">Net</span>
+        <span class="flag" id="fHold">Hold</span>
+        <span class="flag" id="fNeg">−</span>
+      </div>
+      <div class="reading"><span id="num">0.00</span><span id="unitLbl">g</span></div>
+      <div class="sub" id="subline">&nbsp;</div>
+    </div>
+    <div class="keys">
+      <button id="bZero" title="Set the current reading as zero">Zero</button>
+      <button id="bTare" title="Subtract the container on the pan">Tare</button>
+      <button id="bHold" title="Freeze the display">Hold</button>
+      <button id="bRec" class="primary" title="Save this reading to the log">Record</button>
+    </div>
+    <div class="seg" id="units" role="group" aria-label="Unit"></div>
+  </section>
+
+  <section class="panel" aria-label="Input source">
+    <h2>Input</h2>
+    <div class="seg" id="srcSeg" role="group" aria-label="Input source">
+      <button data-src="manual">Type it</button>
+      <button data-src="usb">USB scale</button>
+      <button data-src="demo">Demo</button>
+    </div>
+
+    <div id="pManual" hidden>
+      <div class="row">
+        <label for="manualVal">Gross reading
+          <input id="manualVal" type="number" inputmode="decimal" step="0.01" placeholder="0.00">
+        </label>
+        <label for="manualUnit">Unit on your scale
+          <select id="manualUnit"></select>
+        </label>
+      </div>
+      <p class="note">Read the number off your pocket scale and type it here. Tare, conversions, pricing and the log all work on it.</p>
+    </div>
+
+    <div id="pUsb" hidden>
+      <div class="row">
+        <label for="baud">Baud rate
+          <select id="baud"><option>1200</option><option>2400</option><option selected>9600</option><option>19200</option><option>38400</option><option>115200</option></select>
+        </label>
+        <button id="bConnect" class="primary">Connect scale</button>
+      </div>
+      <p class="note" id="usbNote">For lab and jewelry balances with a USB or RS-232 port (Ohaus, A&amp;D, Sartorius, My Weigh and similar) set to continuous output. Works in Chrome or Edge on a computer.</p>
+    </div>
+
+    <div id="pDemo" hidden>
+      <p class="note warn">Demo mode simulates a 0.01 g scale so you can try the controls. These are not real weights.</p>
+      <div class="row">
+        <button data-demo="0">Empty pan</button>
+        <button data-demo="1.92">Dish 1.92 g</button>
+        <button data-demo="5.47">Dish + item</button>
+      </div>
+    </div>
+
+    <details>
+      <summary class="note">Calibrate with a known weight</summary>
+      <div class="row" style="margin-top:8px">
+        <label for="calRef">Reference weight (g)
+          <input id="calRef" type="number" inputmode="decimal" step="0.01" value="100.00">
+        </label>
+        <button id="bCal">Calibrate</button>
+        <button id="bCalReset">Reset</button>
+      </div>
+      <p class="note" id="calNote">Zero the empty pan, place the reference weight, then press Calibrate.</p>
+    </details>
+  </section>
+
+  <section class="panel" aria-label="Price">
+    <h2>Price</h2>
+    <div class="row">
+      <label for="ppg">Price per gram ($)
+        <input id="ppg" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00">
+      </label>
+      <div><div class="note">Value of net weight</div><div class="total" id="total">$0.00</div></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Log">
+    <div class="row" style="align-items:center">
+      <h2 style="flex:2 1 auto">Log</h2>
+      <button id="bCopy" style="flex:0 0 auto">Copy CSV</button>
+      <button id="bClear" style="flex:0 0 auto">Clear</button>
+    </div>
+    <label for="recLabel">Label for next record
+      <input id="recLabel" type="text" placeholder="e.g. Ring, batch 3">
+    </label>
+    <div class="tablebox"><table class="log" id="logT" hidden>
+      <thead><tr><th>Time</th><th>Label</th><th class="n">Net</th><th class="n">Grams</th><th class="n">Value</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="empty" id="logEmpty">No readings yet. Press Record to save the current net weight here.</p>
+    <p class="note" id="copyNote" hidden></p>
+    <div id="confirmClear" class="row" hidden>
+      <p class="note bad" style="flex:2 1 200px">Delete every logged reading?</p>
+      <button id="bClearYes">Delete all</button><button id="bClearNo">Keep</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  // grams per unit, display decimals
+  const UNITS = {
+    g:   { g: 1,           dp: 2, name: 'g' },
+    ct:  { g: 0.2,         dp: 2, name: 'ct' },
+    oz:  { g: 28.349523125, dp: 3, name: 'oz' },
+    ozt: { g: 31.1034768,  dp: 3, name: 'ozt' },
+    dwt: { g: 1.55517384,  dp: 2, name: 'dwt' },
+    gr:  { g: 0.06479891,  dp: 1, name: 'gr' },
+    kg:  { g: 1000,        dp: 5, name: 'kg' },
+    lb:  { g: 453.59237,   dp: 4, name: 'lb' },
+  };
+  const SHOWN = ['g', 'ct', 'oz', 'ozt', 'dwt', 'gr'];
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('pgs.' + k); return v == null ? d : JSON.parse(v) } catch { return d } },
+    set(k, v) { try { localStorage.setItem('pgs.' + k, JSON.stringify(v)) } catch {} },
+  };
+
+  const S = {
+    src: store.get('src', 'demo'),
+    unit: store.get('unit', 'g'),
+    raw: 0,            // gross grams from source, before calibration
+    zero: 0,           // raw offset
+    tare: 0,           // calibrated grams
+    factor: store.get('factor', 1),
+    hold: false, held: 0,
+    stable: true, srcStable: null,
+    hist: [],
+    log: store.get('log', []),
+  };
+
+  const gross = () => (S.raw - S.zero) * S.factor;
+  const net = () => S.hold ? S.held : gross() - S.tare;
+  const fmt = (g, u = S.unit) => (g / UNITS[u].g).toFixed(UNITS[u].dp);
+  const money = n => '$' + n.toFixed(2);
+
+  function feed(grams, srcStable = null) {
+    S.raw = grams; S.srcStable = srcStable;
+    S.hist.push(grams); if (S.hist.length > 6) S.hist.shift();
+    render();
+  }
+
+  function render() {
+    const n = net();
+    S.stable = S.srcStable ?? (S.hist.length >= 3 && Math.max(...S.hist) - Math.min(...S.hist) <= 0.02);
+    let s = fmt(Math.abs(n));
+    if (Number(s) === 0) s = fmt(0);
+    $('num').textContent = s;
+    $('unitLbl').textContent = UNITS[S.unit].name;
+    $('fStable').classList.toggle('on', S.stable);
+    $('fTare').classList.toggle('on', S.tare !== 0);
+    $('fHold').classList.toggle('on', S.hold);
+    $('fNeg').classList.toggle('on', n < 0 && Number(fmt(Math.abs(n))) !== 0);
+    const parts = [];
+    if (S.unit !== 'g') parts.push(fmt(n, 'g') + ' g');
+    if (S.tare) parts.push('tare ' + fmt(S.tare) + ' ' + S.unit);
+    if (S.factor !== 1) parts.push('cal ×' + S.factor.toFixed(5));
+    $('subline').innerHTML = parts.join(' · ') || '&nbsp;';
+    const ppg = parseFloat($('ppg').value) || 0;
+    $('total').textContent = money(Math.max(0, n) * ppg);
+    $('bHold').classList.toggle('on', S.hold);
+  }
+
+  // units
+  SHOWN.forEach(u => {
+    const b = document.createElement('button'); b.textContent = UNITS[u].name; b.dataset.u = u;
+    b.onclick = () => { S.unit = u; store.set('unit', u); syncSeg(); render() };
+    $('units').append(b);
+    const o = document.createElement('option'); o.value = u; o.textContent = UNITS[u].name; $('manualUnit').append(o);
+  });
+  function syncSeg() {
+    $('units').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === S.unit));
+    $('srcSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.src === S.src));
+  }
+
+  // keys
+  $('bZero').onclick = () => { S.zero = S.raw; S.tare = 0; S.hold = false; render() };
+  $('bTare').onclick = () => { S.tare = S.tare ? 0 : gross(); S.hold = false; render() };
+  $('bHold').onclick = () => { S.hold = !S.hold; S.held = gross() - S.tare; render() };
+  $('bRec').onclick = () => {
+    const g = net(), ppg = parseFloat($('ppg').value) || 0;
+    S.log.unshift({ t: Date.now(), label: $('recLabel').value.trim(), g: +g.toFixed(4), unit: S.unit, value: ppg ? +(Math.max(0, g) * ppg).toFixed(2) : null, src: S.src });
+    store.set('log', S.log); $('recLabel').value = ''; drawLog();
+  };
+  $('ppg').value = store.get('ppg', '');
+  $('ppg').oninput = () => { store.set('ppg', $('ppg').value); render() };
+
+  // sources
+  let demoTimer = null, demoTarget = 0, demoVal = 0;
+  function setSrc(src) {
+    S.src = src; store.set('src', src);
+    $('pManual').hidden = src !== 'manual'; $('pUsb').hidden = src !== 'usb'; $('pDemo').hidden = src !== 'demo';
+    $('srcName').textContent = { manual: 'Typed reading', usb: port ? 'USB scale (connected)' : 'USB scale', demo: 'Demo (simulated)' }[src];
+    clearInterval(demoTimer); S.hist = [];
+    if (src === 'demo') {
+      demoTimer = setInterval(() => {
+        demoVal += (demoTarget - demoVal) * 0.45;
+        const noise = Math.abs(demoTarget - demoVal) < 0.01 ? (Math.random() < 0.15 ? 0.01 : 0) : 0;
+        feed(Math.round((demoVal + noise) * 100) / 100);
+      }, 250);
+    } else if (src === 'manual') manualFeed();
+    syncSeg(); render();
+  }
+  $('srcSeg').onclick = e => { const b = e.target.closest('button'); if (b) setSrc(b.dataset.src) };
+  document.querySelectorAll('[data-demo]').forEach(b => b.onclick = () => { demoTarget = parseFloat(b.dataset.demo) });
+
+  function manualFeed() {
+    const v = parseFloat($('manualVal').value);
+    S.hist = [];
+    feed(isNaN(v) ? 0 : v * UNITS[$('manualUnit').value].g, true);
+  }
+  $('manualVal').oninput = manualFeed; $('manualUnit').onchange = manualFeed;
+
+  // USB / RS-232 via Web Serial. Parses lines like "ST,GS,+  12.34 g", "US +0.52g", "  3.140 ozt"
+  let port = null, reader = null;
+  function parseLine(line) {
+    const m = line.match(/([-+]?)\s*(\d+(?:[.,]\d+)?)\s*(g|gm|kg|ct|oz|ozt|dwt|gr|gn|lb)?\b/i);
+    if (!m) return null;
+    let u = (m[3] || 'g').toLowerCase(); if (u === 'gm') u = 'g'; if (u === 'gn') u = 'gr';
+    const v = parseFloat(m[2].replace(',', '.')) * (m[1] === '-' ? -1 : 1);
+    const stable = /\bST\b|\bS\s+S\b/.test(line) ? true : /\bUS\b|\bS\s+D\b|\?/.test(line) ? false : null;
+    return { g: v * UNITS[u].g, stable };
+  }
+  $('bConnect').onclick = async () => {
+    const note = $('usbNote');
+    if (port) { try { await reader?.cancel(); await port.close() } catch {} port = null; $('bConnect').textContent = 'Connect scale'; setSrc('usb'); return }
+    if (!('serial' in navigator)) { note.className = 'note bad'; note.textContent = 'This browser cannot talk to USB scales. Open the page in Chrome or Edge on a computer, or use Type it.'; return }
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: +$('baud').value });
+      $('bConnect').textContent = 'Disconnect'; note.className = 'note'; note.textContent = 'Connected. Waiting for readings…'; setSrc('usb');
+      const dec = new TextDecoderStream(); port.readable.pipeTo(dec.writable).catch(() => {});
+      reader = dec.readable.getReader(); let buf = '';
+      for (;;) {
+        const { value, done } = await reader.read(); if (done) break;
+        buf += value; const lines = buf.split(/\r?\n|\r/); buf = lines.pop();
+        for (const l of lines) { const r = parseLine(l); if (r && S.src === 'usb') { feed(r.g, r.stable); note.textContent = 'Last line from scale: ' + l.trim() } }
+      }
+    } catch (e) {
+      port = null; $('bConnect').textContent = 'Connect scale';
+      note.className = 'note bad';
+      note.textContent = e.name === 'NotFoundError' ? 'No scale picked. Plug it in, set it to continuous output, and try again.' : 'Could not read the scale: ' + e.message + '. Check the baud rate matches the scale settings.';
+    }
+  };
+
+  // calibration
+  $('bCal').onclick = () => {
+    const ref = parseFloat($('calRef').value), g = S.raw - S.zero;
+    if (!(ref > 0) || Math.abs(g) < 0.01) { $('calNote').className = 'note bad'; $('calNote').textContent = 'Place the reference weight on a zeroed pan first.'; return }
+    S.factor = ref / g; store.set('factor', S.factor);
+    $('calNote').className = 'note'; $('calNote').textContent = 'Calibrated. Readings are now multiplied by ' + S.factor.toFixed(5) + '.'; render();
+  };
+  $('bCalReset').onclick = () => { S.factor = 1; store.set('factor', 1); $('calNote').className = 'note'; $('calNote').textContent = 'Calibration cleared.'; render() };
+
+  // log
+  function drawLog() {
+    const tb = $('logT').tBodies[0]; tb.textContent = '';
+    S.log.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      const d = new Date(r.t);
+      [d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+       r.label || '—', fmt(r.g, r.unit) + ' ' + UNITS[r.unit].name, r.g.toFixed(2), r.value == null ? '—' : money(r.value)]
+        .forEach((txt, j) => { const td = document.createElement('td'); td.textContent = txt; if (j >= 2) td.className = 'n'; tr.append(td) });
+      const td = document.createElement('td'), b = document.createElement('button');
+      b.textContent = 'Remove'; b.onclick = () => { S.log.splice(i, 1); store.set('log', S.log); drawLog() };
+      td.append(b); tr.append(td); tb.append(tr);
+    });
+    $('logT').hidden = !S.log.length; $('logEmpty').hidden = !!S.log.length;
+  }
+  function csv() {
+    const q = s => '"' + String(s).replace(/"/g, '""') + '"';
+    return ['time,label,net,unit,grams,value_usd,source', ...S.log.map(r =>
+      [new Date(r.t).toISOString(), q(r.label), fmt(r.g, r.unit), r.unit, r.g.toFixed(2), r.value ?? '', r.src].join(','))].join('\n');
+  }
+  $('bCopy').onclick = () => {
+    const n = $('copyNote'); n.hidden = false;
+    navigator.clipboard.writeText(csv()).then(() => { n.textContent = 'Copied ' + S.log.length + ' rows. Paste into Sheets or Excel.' })
+      .catch(() => { n.textContent = 'Copy was blocked. Select the text below and copy it.'; const ta = document.createElement('textarea'); ta.value = csv(); ta.rows = 5; ta.style.width = '100%'; n.after(ta); ta.select() });
+  };
+  $('bClear').onclick = () => { $('confirmClear').hidden = false };
+  $('bClearNo').onclick = () => { $('confirmClear').hidden = true };
+  $('bClearYes').onclick = () => { S.log = []; store.set('log', []); $('confirmClear').hidden = true; drawLog() };
+
+  // start: demo opens with a dish on the pan so the display shows something
+  if (S.src === 'demo') demoTarget = 3.5;
+  setSrc(S.src); drawLog();
+})();
+</script>
+</body></html>
