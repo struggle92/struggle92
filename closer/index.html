@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="description" content="A private guide of positions and how-tos for a couple, with favorites, a tried/rating tracker and shared notes.">
+<meta name="description" content="A private guide of positions and how-tos for a couple, with a surprise date-night generator, favorites, a tried/rating tracker and shared notes.">
 <style>
   :root { padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px); }
   html, body { margin: 0; }
@@ -68,6 +68,23 @@
   .btn:active { transform: translateY(0); }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-wheel { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #fff; }
+  .btn-date { background: var(--fg); color: var(--bg); }
+
+  /* Date-night card */
+  .datebox { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-46%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; width: min(560px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 26px; }
+  .datebox.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+  .datebox .close { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px; font-size: 18px; cursor: pointer; line-height: 1; }
+  .date-vibe { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .datebox h2 { font-size: 30px; margin: 6px 0 2px; padding-right: 40px; }
+  .date-tag { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .date-rows { display: grid; gap: 14px; }
+  .date-row { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; }
+  .date-row .ic { font-size: 22px; line-height: 1.2; text-align: center; }
+  .date-row .lbl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 1px; }
+  .date-row .val { font-size: 15px; color: var(--fg); }
+  .date-row .val b { font-family: var(--font-display); font-weight: 600; }
+  .date-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  .nightcap-link { background: none; border: none; color: var(--accent); font: inherit; font-size: 15px; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
 
   .sync { margin-top: 14px; display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted);
     background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; }
@@ -160,8 +177,9 @@
   <h1>Closer</h1>
   <p class="sub">A private little guide to explore together — slow down, talk, and have fun.</p>
   <div class="actions">
+    <button class="btn btn-date" id="openDate">💘 Surprise Date Night</button>
     <button class="btn btn-primary" id="surprise">✦ Surprise Us</button>
-    <button class="btn btn-wheel" id="openWheel">🎡 Date-Night Wheel</button>
+    <button class="btn btn-wheel" id="openWheel">🎡 Position Wheel</button>
   </div>
   <div><span class="sync" id="sync"><span class="dot"></span><span id="syncLabel">Saved on this device</span></span></div>
 </header>
@@ -199,6 +217,15 @@
   <div class="wheel-wrap"><canvas id="wheel" width="600" height="600"></canvas></div>
   <div class="wheel-result" id="wheelResult"></div>
   <button class="btn btn-wheel" id="spinBtn">Spin</button>
+</div>
+
+<div class="datebox" id="datebox" role="dialog" aria-modal="true" aria-label="Surprise date night">
+  <button class="close" id="dateClose" aria-label="Close">×</button>
+  <div id="dateContent"></div>
+  <div class="date-actions">
+    <button class="btn btn-date" id="dateShuffle">↻ Shuffle again</button>
+    <button class="btn btn-primary" id="dateWheel">🎡 Pick a position</button>
+  </div>
 </div>
 
 <button class="theme-toggle" id="theme" aria-label="Toggle light and dark">☾</button>
@@ -428,6 +455,7 @@ function render() {
 
 function openSheet(p) {
   closeWheel();
+  closeDate();
   currentId = p.id;
   sheet.innerHTML = `
     <button class="close" id="closeBtn" aria-label="Close">×</button>
@@ -509,8 +537,8 @@ function closeSheet() {
   render();
 }
 
-scrim.addEventListener("click", () => { closeSheet(); closeWheel(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSheet(); closeWheel(); } });
+scrim.addEventListener("click", () => { closeSheet(); closeWheel(); closeDate(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSheet(); closeWheel(); closeDate(); } });
 
 chips.addEventListener("click", (e) => {
   const btn = e.target.closest(".chip");
@@ -593,6 +621,65 @@ document.getElementById("spinBtn").addEventListener("click", () => {
     wheelResult.appendChild(go);
   }, 4600);
 });
+
+/* ---------- Surprise Date Night ---------- */
+const DATES = [
+  { vibe:"Cozy night in", title:"Blanket-fort movie night", where:"Your living room, lights off, every pillow and blanket you own on the floor.", what:"Build an actual fort, pick one movie each, and whoever's film it is has to feed the other snacks.", touch:"No phones allowed inside the fort. First one to check theirs owes a back rub." },
+  { vibe:"Low-key outing", title:"Golden-hour walk & treat", where:"A park, waterfront, or any street with a good sunset view, ending at a dessert or ice-cream spot.", what:"Walk with no destination for an hour, then share one dessert with two spoons.", touch:"Hold hands the whole walk and take turns asking a question you've never asked each other." },
+  { vibe:"Playful & cheap", title:"Grocery store mystery dinner", where:"Your nearest supermarket, then back to the kitchen.", what:"Split up, each grab three secret ingredients, then cook a meal together using all six. No takeout rescue allowed.", touch:"Loser of 'whose dish was better' does the dishes. Wine optional but encouraged." },
+  { vibe:"A little fancy", title:"Dress up, go out", where:"A restaurant or cocktail bar you've been meaning to try — one notch nicer than usual.", what:"Actually dress up for each other. Order something neither of you has had before.", touch:"Leave a little early and take the long way home." },
+  { vibe:"Adventurous", title:"Yes-day mini adventure", where:"Anywhere new — a neighborhood, trail, market, or town you've never explored.", what:"Flip a coin at every turn: heads go left, tails go right. See where you end up.", touch:"Buy each other one small surprise under $10 from wherever you land." },
+  { vibe:"Rainy-day in", title:"Spa night at home", where:"Your bathroom and bedroom, candles lit, phones in another room.", what:"Run a bath or do face masks, then give each other a proper slow massage with oil.", touch:"Warm the towels. Take turns — no rushing the giver's turn." },
+  { vibe:"Nostalgic", title:"Throwback date", where:"Home, or wherever you had one of your early dates.", what:"Recreate your first date as closely as you can, or look through old photos and messages together.", touch:"Tell each other one thing you remember most from when you first met." },
+  { vibe:"Competitive fun", title:"Game night, stakes included", where:"Your place, or a bar with games / a mini-golf / arcade spot.", what:"Pick 3 games. Keep score across all of them for an overall champion.", touch:"Winner picks the nightcap from the app. Loser can't complain." },
+  { vibe:"Lazy Sunday", title:"Breakfast in bed, all day", where:"The bed. That's the whole venue.", what:"Make breakfast together, bring it back to bed, and don't get dressed until you have to.", touch:"One rule: stay in bed as long as you can. See what the day turns into." },
+  { vibe:"Creative", title:"Make something together", where:"Home, with whatever supplies you've got — or a paint/pottery studio if you want to go out.", what:"Paint, cook an ambitious recipe, build a playlist for each other, or do a couples' drawing where you each add to the same page.", touch:"Keep whatever you make. It's the souvenir." },
+  { vibe:"Under the stars", title:"Stargazing picnic", where:"A rooftop, backyard, park, or a drive out past the city lights.", what:"Pack snacks and a blanket, lie back, and find shapes in the stars. Bring a thermos of something warm.", touch:"Put on a slow playlist and have one slow dance with no one watching." },
+  { vibe:"Spontaneous", title:"Drive with no plan", where:"Your car and an open evening.", what:"Pick a direction, drive, and stop at the first place that looks interesting — a diner, a lookout, a weird roadside stop.", touch:"Make a shared playlist on the way and take turns picking songs." },
+  { vibe:"Homebody luxe", title:"Fancy dinner, home edition", where:"Your kitchen and dining table, done up like a restaurant.", what:"Cook a three-course meal together, set the table properly, light candles, dress up anyway.", touch:"Make a tiny handwritten 'menu'. Cheesy on purpose." },
+  { vibe:"Daytime", title:"Market & coffee crawl", where:"A farmers' market, flea market, or a few cafés in one walkable area.", what:"Wander, taste things, pick out something small for your place together.", touch:"Each secretly buy the other their favorite coffee order and swap." },
+  { vibe:"Steamy in", title:"No-plans night", where:"Home, door locked, nowhere to be.", what:"Open the app, spin the wheel together, and let it set the tone for the whole evening.", touch:"Start slow. Tease more than you think you should." },
+  { vibe:"Reset together", title:"Phones-off evening", where:"Home or a quiet walk — anywhere, as long as screens stay away.", what:"Put both phones in a drawer for the whole night and just be together — talk, cook, lie around.", touch:"Ask each other: what's one thing you've wanted to do together but haven't yet?" },
+];
+
+const datebox = document.getElementById("datebox");
+const dateContent = document.getElementById("dateContent");
+let lastDateIdx = -1;
+
+function rollDate() {
+  // avoid repeating the immediately previous idea
+  let idx;
+  do { idx = Math.floor(Math.random() * DATES.length); } while (DATES.length > 1 && idx === lastDateIdx);
+  lastDateIdx = idx;
+  const d = DATES[idx];
+
+  // nightcap: prefer a favorite, else any position
+  const favPool = POSITIONS.filter(p => isFav(p.id));
+  const pool = favPool.length ? favPool : POSITIONS;
+  const cap = pool[Math.floor(Math.random() * pool.length)];
+
+  dateContent.innerHTML = `
+    <div class="date-vibe">${d.vibe}</div>
+    <h2>${d.title}</h2>
+    <div class="date-tag">Your surprise plan for tonight</div>
+    <div class="date-rows">
+      <div class="date-row"><div class="ic">📍</div><div><div class="lbl">Where to go</div><div class="val">${d.where}</div></div></div>
+      <div class="date-row"><div class="ic">✨</div><div><div class="lbl">What to do</div><div class="val">${d.what}</div></div></div>
+      <div class="date-row"><div class="ic">💡</div><div><div class="lbl">Little touch</div><div class="val">${d.touch}</div></div></div>
+      <div class="date-row"><div class="ic">🔥</div><div><div class="lbl">Nightcap${favPool.length ? " (a favorite)" : ""}</div><div class="val"><button class="nightcap-link" id="capLink">${cap.name}</button> — ${cap.blurb}</div></div></div>
+    </div>
+  `;
+  const capLink = dateContent.querySelector("#capLink");
+  capLink.addEventListener("click", () => openSheet(cap));
+}
+
+function openDate() { closeSheet(); closeWheel(); rollDate(); scrim.classList.add("open"); datebox.classList.add("open"); }
+function closeDate() { datebox.classList.remove("open"); if (!sheet.classList.contains("open") && !wheelbox.classList.contains("open")) scrim.classList.remove("open"); }
+
+document.getElementById("openDate").addEventListener("click", openDate);
+document.getElementById("dateClose").addEventListener("click", closeDate);
+document.getElementById("dateShuffle").addEventListener("click", rollDate);
+document.getElementById("dateWheel").addEventListener("click", () => { closeDate(); openWheel(); });
 
 // Theme toggle (per-device)
 const themeBtn = document.getElementById("theme");
