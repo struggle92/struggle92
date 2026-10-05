@@ -6,12 +6,16 @@ spin wheel.
 
 ## Features
 
-- **20 positions** across Easy / Medium / Adventurous, each with how-to steps, tips, and a vibe.
-- **Search + filters** (difficulty, favorites, tried).
+- **20 positions** (plus your own) across Easy / Medium / Adventurous, each with how-to steps, tips, and a vibe.
+- **Search + filters** — difficulty, favorites, wishlist, tried.
 - **Favorites** — tap the ♥ on any card.
 - **Surprise Us** — random pick from the current filter/search.
-- **Date-Night Wheel** — spin to let it choose, with its own filters.
-- **Shared log** — mark positions as tried, rate them 1–5 stars, and keep notes.
+- **Surprise Date Night** — shuffles a full plan: vibe, where to go, what to do, a little touch, and a nightcap position.
+- **Spicy Dares** — a shuffle deck of playful prompts.
+- **Position Wheel** — spin to let it choose, with its own filters.
+- **Add Your Own** — add positions, date ideas, and dares; they merge into everything and sync between partners.
+- **Journal** — a shared history of what you've tried (with dates and ratings) and a shared wishlist of what you want to try.
+- **Shared log** — mark tried, "want to try", rate 1–5 stars, and keep notes.
 
 ## How the log syncs
 

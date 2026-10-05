@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="description" content="A private guide for a couple: positions, a surprise date-night generator, spicy dares, and your own added ideas — with favorites, a tried/rating tracker and shared notes.">
+<meta name="description" content="A private guide for a couple: positions, a surprise date-night generator, spicy dares, your own added ideas, a shared journal and wishlist — favorites, ratings, and synced notes.">
 <style>
   :root { padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px); }
   html, body { margin: 0; }
@@ -97,6 +97,17 @@
   .remove-btn { border: 1px solid var(--line); background: var(--surface); color: var(--red); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
   .mine-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); padding: 2px 7px; border-radius: 999px; }
 
+  /* Journal list */
+  .jlist { display: grid; gap: 10px; }
+  .jrow { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 13px 15px; cursor: pointer; font-family: inherit; color: var(--fg); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .jrow:hover { border-color: var(--accent); }
+  .jrow .jname { font-family: var(--font-display); font-size: 17px; }
+  .jrow .jmeta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .jrow .jright { text-align: right; flex: none; }
+  .jrow .jstars { color: var(--gold); font-size: 13px; letter-spacing: 1px; }
+  .jrow .jdate { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .jempty { text-align: center; color: var(--muted); padding: 36px 10px; }
+
   /* Date-night card */
   .datebox { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-46%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; width: min(560px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 26px; }
   .datebox.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
@@ -128,6 +139,7 @@
   .chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
   .chip.fav[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); }
   .chip.tried[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+  .chip.want[aria-pressed="true"] { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
 
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding-bottom: 60px; }
   @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
@@ -149,6 +161,7 @@
   .card-badges { position: absolute; bottom: 14px; right: 14px; display: flex; gap: 5px; font-size: 13px; }
   .card-badges .b { color: var(--green); }
   .card-badges .b.rate { color: var(--gold); }
+  .card-badges .b.want { color: var(--accent-2); }
 
   .scrim { position: fixed; inset: 0; background: rgba(30,10,18,.6); backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s; }
   .scrim.open { opacity: 1; pointer-events: auto; }
@@ -170,6 +183,7 @@
   .tried-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .toggle { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
   .toggle[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+  .toggle.want-toggle[aria-pressed="true"] { background: var(--accent-2); border-color: var(--accent-2); color: #fff; }
   .stars { display: inline-flex; gap: 2px; }
   .stars button { border: none; background: none; cursor: pointer; font-size: 24px; line-height: 1; padding: 2px; color: var(--line); transition: color .12s, transform .12s; }
   .stars button.on { color: var(--gold); }
@@ -208,6 +222,7 @@
     <button class="btn btn-dare" id="openDare">😈 Dares</button>
     <button class="btn btn-primary" id="surprise">✦ Surprise Us</button>
     <button class="btn btn-wheel" id="openWheel">🎡 Position Wheel</button>
+    <button class="btn btn-add" id="openJournal">📖 Journal</button>
     <button class="btn btn-add" id="openAdd">➕ Add Your Own</button>
   </div>
   <div><span class="sync" id="sync"><span class="dot"></span><span id="syncLabel">Saved on this device</span></span></div>
@@ -222,6 +237,7 @@
       <button class="chip" data-filter="medium" aria-pressed="false">Medium</button>
       <button class="chip" data-filter="adventurous" aria-pressed="false">Adventurous</button>
       <button class="chip fav" data-filter="favs" aria-pressed="false">♥ Favorites</button>
+      <button class="chip want" data-filter="want" aria-pressed="false">✨ Wishlist</button>
       <button class="chip tried" data-filter="tried" aria-pressed="false">✓ Tried</button>
     </div>
   </div>
@@ -266,6 +282,17 @@
     <button class="btn btn-dare" id="dareShuffle">↻ Another</button>
     <button class="btn btn-add" id="dareRemove" hidden>Remove this</button>
   </div>
+</div>
+
+<div class="modal" id="journalbox" role="dialog" aria-modal="true" aria-label="Journal">
+  <button class="close" id="journalClose" aria-label="Close">×</button>
+  <h2 style="font-size:26px;margin-bottom:2px">Your journal</h2>
+  <p style="color:var(--muted);font-size:13px;margin:4px 0 0">Shared between the two of you.</p>
+  <div class="seg" id="journalSeg">
+    <button data-tab="tried" aria-pressed="true">Tried together</button>
+    <button data-tab="want" aria-pressed="false">Wishlist</button>
+  </div>
+  <div id="journalList"></div>
 </div>
 
 <div class="modal" id="addbox" role="dialog" aria-modal="true" aria-label="Add your own">
@@ -428,7 +455,7 @@ let activeFilter = "all";
 let query = "";
 let currentId = null; // open position in the sheet
 
-function overlayEls() { return [sheet, wheelbox, datebox, darebox, addbox]; }
+function overlayEls() { return [sheet, wheelbox, datebox, darebox, addbox, journalbox]; }
 function anyOverlayOpen() { return overlayEls().some(m => m && m.classList.contains("open")); }
 function syncScrim() { if (anyOverlayOpen()) scrim.classList.add("open"); else scrim.classList.remove("open"); }
 function closeOverlaysExcept(keep) {
@@ -448,8 +475,10 @@ const inflight = {}, dirty = {};
 function entry(id) { return LOG[id] || (LOG[id] = {}); }
 const isFav = id => !!(LOG[id] && LOG[id].fav);
 const isTried = id => !!(LOG[id] && LOG[id].tried);
+const isWant = id => !!(LOG[id] && LOG[id].want);
 const ratingOf = id => (LOG[id] && LOG[id].rating) || 0;
 const noteOf = id => (LOG[id] && LOG[id].note) || "";
+const triedAtOf = id => (LOG[id] && LOG[id].triedAt) || 0;
 
 function loadLocal() { try { Object.assign(LOG, JSON.parse(localStorage.getItem("closer-log") || "{}")); } catch (e) {} }
 function saveLocal() { try { localStorage.setItem("closer-log", JSON.stringify(LOG)); } catch (e) {} }
@@ -459,8 +488,10 @@ function cleanEntry(id) {
   const out = {};
   if (e.fav) out.fav = true;
   if (e.tried) out.tried = true;
+  if (e.want) out.want = true;
   if (e.rating) out.rating = e.rating;
   if (e.note) out.note = e.note;
+  if (e.triedAt) out.triedAt = e.triedAt;
   return out;
 }
 
@@ -533,6 +564,7 @@ function levelLabel(l) { return l.charAt(0).toUpperCase() + l.slice(1); }
 function matches(p, filter) {
   if (filter === "favs") return isFav(p.id);
   if (filter === "tried") return isTried(p.id);
+  if (filter === "want") return isWant(p.id) && !isTried(p.id);
   if (["easy","medium","adventurous"].includes(filter)) return p.level === filter;
   return true;
 }
@@ -550,6 +582,7 @@ function render() {
   if (!list.length) {
     let msg = "Try another search.";
     if (activeFilter === "favs") msg = "Tap the ♥ on any card to save it.";
+    if (activeFilter === "want") msg = "Open a position and add it to your wishlist.";
     if (activeFilter === "tried") msg = "Open a position and mark it tried to build your history.";
     grid.innerHTML = `<div class="empty">Nothing here yet.<br>${msg}</div>`;
     return;
@@ -558,7 +591,7 @@ function render() {
     const card = document.createElement("button");
     card.className = "card";
     card.setAttribute("aria-label", "Open " + p.name);
-    const badges = `${isTried(p.id) ? '<span class="b" title="Tried">✓</span>' : ""}${ratingOf(p.id) ? `<span class="b rate" title="${ratingOf(p.id)} of 5">${"★".repeat(ratingOf(p.id))}</span>` : ""}`;
+    const badges = `${(isWant(p.id) && !isTried(p.id)) ? '<span class="b want" title="On wishlist">✨</span>' : ""}${isTried(p.id) ? '<span class="b" title="Tried">✓</span>' : ""}${ratingOf(p.id) ? `<span class="b rate" title="${ratingOf(p.id)} of 5">${"★".repeat(ratingOf(p.id))}</span>` : ""}`;
     card.innerHTML = `
       <button class="heart" aria-pressed="${isFav(p.id)}" aria-label="Save to favorites">♥</button>
       <div class="row"><span class="level ${p.level}">${levelLabel(p.level)}</span>${p.custom ? '<span class="mine-badge">Yours</span>' : ""}</div>
@@ -595,6 +628,7 @@ function openSheet(p) {
       <h4 style="color:var(--accent);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;font-weight:700">Your shared log</h4>
       <div class="tried-row">
         <button class="toggle" id="triedBtn" aria-pressed="${isTried(p.id)}">${isTried(p.id) ? "✓ Tried it" : "Mark as tried"}</button>
+        <button class="toggle want-toggle" id="wantBtn" aria-pressed="${isWant(p.id)}">${isWant(p.id) ? "✨ On wishlist" : "Add to wishlist"}</button>
         <div class="stars" id="stars" role="group" aria-label="Rate this">
           ${[1,2,3,4,5].map(n => `<button data-star="${n}" class="${ratingOf(p.id) >= n ? "on" : ""}" aria-label="${n} star${n>1?"s":""}">★</button>`).join("")}
         </div>
@@ -614,11 +648,20 @@ function openSheet(p) {
   }
 
   const triedBtn = sheet.querySelector("#triedBtn");
+  const wantBtn = sheet.querySelector("#wantBtn");
   triedBtn.addEventListener("click", () => {
-    entry(p.id).tried = !isTried(p.id);
+    const now = !isTried(p.id);
+    entry(p.id).tried = now;
+    if (now && !triedAtOf(p.id)) entry(p.id).triedAt = Date.now();
     persist(p.id);
-    triedBtn.setAttribute("aria-pressed", isTried(p.id));
-    triedBtn.textContent = isTried(p.id) ? "✓ Tried it" : "Mark as tried";
+    triedBtn.setAttribute("aria-pressed", now);
+    triedBtn.textContent = now ? "✓ Tried it" : "Mark as tried";
+  });
+  wantBtn.addEventListener("click", () => {
+    entry(p.id).want = !isWant(p.id);
+    persist(p.id);
+    wantBtn.setAttribute("aria-pressed", isWant(p.id));
+    wantBtn.textContent = isWant(p.id) ? "✨ On wishlist" : "Add to wishlist";
   });
 
   const starWrap = sheet.querySelector("#stars");
@@ -627,7 +670,7 @@ function openSheet(p) {
     if (!b) return;
     const n = +b.dataset.star;
     entry(p.id).rating = (ratingOf(p.id) === n) ? 0 : n;
-    if (ratingOf(p.id) && !isTried(p.id)) { entry(p.id).tried = true; triedBtn.setAttribute("aria-pressed","true"); triedBtn.textContent = "✓ Tried it"; }
+    if (ratingOf(p.id) && !isTried(p.id)) { entry(p.id).tried = true; if (!triedAtOf(p.id)) entry(p.id).triedAt = Date.now(); triedBtn.setAttribute("aria-pressed","true"); triedBtn.textContent = "✓ Tried it"; }
     persist(p.id);
     [...starWrap.children].forEach(s => s.classList.toggle("on", ratingOf(p.id) >= +s.dataset.star));
   });
@@ -658,6 +701,8 @@ function refreshSheetLive() {
   const id = currentId;
   const triedBtn = sheet.querySelector("#triedBtn");
   if (triedBtn) { triedBtn.setAttribute("aria-pressed", isTried(id)); triedBtn.textContent = isTried(id) ? "✓ Tried it" : "Mark as tried"; }
+  const wantBtn = sheet.querySelector("#wantBtn");
+  if (wantBtn) { wantBtn.setAttribute("aria-pressed", isWant(id)); wantBtn.textContent = isWant(id) ? "✨ On wishlist" : "Add to wishlist"; }
   const starWrap = sheet.querySelector("#stars");
   if (starWrap) [...starWrap.children].forEach(s => s.classList.toggle("on", ratingOf(id) >= +s.dataset.star));
   const noteEl = sheet.querySelector("#note");
@@ -849,6 +894,50 @@ dareRemove.addEventListener("click", () => {
   if (dareRemove.dataset.confirm) { removeCustom("dares", currentDare.id); rollDare(); }
   else { dareRemove.dataset.confirm = "1"; dareRemove.textContent = "Tap again to remove"; }
 });
+
+/* ---------- Journal (history + wishlist) ---------- */
+const journalbox = document.getElementById("journalbox");
+const journalList = document.getElementById("journalList");
+const journalSeg = document.getElementById("journalSeg");
+let journalTab = "tried";
+
+function fmtDate(ts) {
+  if (!ts) return "";
+  try { return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); }
+  catch (e) { return ""; }
+}
+function renderJournal() {
+  [...journalSeg.children].forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === journalTab));
+  const all = positionsList();
+  let rows;
+  if (journalTab === "tried") {
+    rows = all.filter(p => isTried(p.id)).sort((a, b) => triedAtOf(b.id) - triedAtOf(a.id));
+  } else {
+    rows = all.filter(p => isWant(p.id) && !isTried(p.id)).sort((a, b) => a.name.localeCompare(b.name));
+  }
+  if (!rows.length) {
+    journalList.innerHTML = `<div class="jempty">${journalTab === "tried" ? "Nothing logged yet. Mark a position as tried and it'll appear here, newest first." : "Your wishlist is empty. Open any position and tap “Add to wishlist.”"}</div>`;
+    return;
+  }
+  journalList.innerHTML = `<div class="jlist">${rows.map(p => {
+    const right = journalTab === "tried"
+      ? `<div class="jright">${ratingOf(p.id) ? `<div class="jstars">${"★".repeat(ratingOf(p.id))}</div>` : ""}${triedAtOf(p.id) ? `<div class="jdate">${fmtDate(triedAtOf(p.id))}</div>` : ""}</div>`
+      : `<div class="jright"><div class="jdate">${levelLabel(p.level)}</div></div>`;
+    const sub = (journalTab === "tried" && noteOf(p.id)) ? `<div class="jmeta">${noteOf(p.id).slice(0, 80).replace(/</g,"&lt;")}${noteOf(p.id).length > 80 ? "…" : ""}</div>` : `<div class="jmeta">${p.tags ? p.tags.slice(0,2).join(" · ") : ""}</div>`;
+    return `<button class="jrow" data-id="${p.id}"><span><span class="jname">${p.name}</span>${sub}</span>${right}</button>`;
+  }).join("")}</div>`;
+  journalList.querySelectorAll(".jrow").forEach(row => {
+    row.addEventListener("click", () => {
+      const p = positionsList().find(x => x.id === row.dataset.id);
+      if (p) openSheet(p);
+    });
+  });
+}
+function openJournal() { closeOverlaysExcept(journalbox); renderJournal(); journalbox.classList.add("open"); syncScrim(); }
+function closeJournal() { journalbox.classList.remove("open"); syncScrim(); }
+document.getElementById("openJournal").addEventListener("click", openJournal);
+document.getElementById("journalClose").addEventListener("click", closeJournal);
+journalSeg.addEventListener("click", (e) => { const b = e.target.closest("button[data-tab]"); if (!b) return; journalTab = b.dataset.tab; renderJournal(); });
 
 /* ---------- Add Your Own ---------- */
 const addbox = document.getElementById("addbox");
