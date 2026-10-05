@@ -1,0 +1,8 @@
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:1200px;background:linear-gradient(160deg,#ffe9dc,#ffd3c2)}
+body{width:100vw;height:1200px;font-family:"Helvetica Neue",Arial,sans-serif;background:transparent;color:#3b2a26;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+h1{font-size:84px;font-weight:800;letter-spacing:-2px;text-align:center;line-height:1}
+h2{font-size:44px;font-weight:600;text-align:center;opacity:.8;margin-top:18px}
+.dot{border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.95),rgba(255,255,255,.55) 55%,rgba(240,225,215,.7));box-shadow:0 2px 6px rgba(120,70,50,.25),inset 0 0 0 2px rgba(255,255,255,.9)}
+.case{background:#fff;border-radius:48px;box-shadow:0 30px 60px rgba(120,60,40,.25);padding:46px;display:grid;gap:22px;justify-items:center;align-items:center}
+.tag{white-space:nowrap;background:#3b2a26;color:#fff;border-radius:999px;padding:14px 34px;font-size:34px;font-weight:700}

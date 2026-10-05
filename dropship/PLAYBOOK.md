@@ -1,7 +1,7 @@
 # Dropship Store Playbook: Overnight Pimple Patches
 
 Store: `qfs1-store.myshopify.com` (Shopify Basic)
-Hero product: **Overnight Pimple Patches** (Shopify draft, `gid://shopify/Product/9531242348633`)
+Hero product: **Overnight Pimple Patches**, live at https://qfs1-store.myshopify.com/products/overnight-pimple-patches-invisible-hydrocolloid-dots-36-per-case
 Launch budget: **$0 ads, organic content only**
 
 ## Why this product
@@ -30,7 +30,23 @@ Realistic timeline if you post 2–3 times a day: **month 1: $0–1k, month 2: $
 
 Once organic sales cover it, put **30% of profit back into Spark Ads** (boosting your own best organic posts). That's the step that takes you from $3k to $10k+.
 
-## Setup checklist (in order, about 2 hours total)
+## Done (Oct 5, 2026)
+
+- Product **ACTIVE** and published to Online Store + Shop app: 3 bundles ($14.99 / $29.99 / $44.99) with compare-at prices and 4 product images (source files in `images/`, re-render with Playwright)
+- **Free US shipping over $25** (automatic discount) and **WELCOME10** (10% off, one use per customer)
+- **FAQ** and **About Us** pages, added to the main menu and footer menu
+- Main menu: Home · Shop Patches · FAQ · Contact
+
+## Still on you (the connector can't do these)
+
+1. **Supplier:** install CJdropshipping (or DSers) → find a 36-count, 3-size hydrocolloid patch listing → link it to SKUs PP-1, PP-3, PP-6 → turn on auto-fulfill. **Until this is done, every order has to be fulfilled by hand.**
+2. **Payments:** Settings → Payments → finish Shopify Payments setup (bank and ID).
+3. **Password page:** Online Store → Preferences → turn off the password.
+4. **Policies:** Settings → Policies → paste in the text from `policies.md`. The connector doesn't have permission to edit policies, and the current refund policy demands "unused with tags", which doesn't fit a hygiene product.
+5. **Social accounts:** connect TikTok, Instagram, Facebook and YouTube in Metricool (https://app.metricool.com/brands/connections?blogId=6955454) so posts can be scheduled.
+6. **Rename the store** (Settings → Store details). "QFS" says nothing to a skincare shopper.
+
+## Full setup reference
 
 1. **Supplier:** in Shopify Admin → Apps, install **CJdropshipping** or **DSers**. Search "hydrocolloid pimple patch 36". Choose a listing with a 4.7★+ rating, US warehouse or 7–12 day ePacket shipping, and real buyer photos.
 2. **Link the supplier listing** to the draft product's 3 variants (PP-1, PP-3, PP-6). Turn on auto-fulfill.
@@ -88,7 +104,3 @@ Kill a hook after 3 videos under 1k views. Double down on any format over 50k vi
 - Fake countdown timers and "only 3 left" scarcity count as deceptive practices. Don't use them.
 - Ship-time honesty: say 7–12 days if that's what it is. Late orders turn into chargebacks.
 - Disclose any paid creator content with #ad.
-
-## Already in your store
-
-- **Graduated Compression Socks** (archived, 40 units in stock, $25). That's real inventory with zero supplier risk. Once patches are live, relaunch the socks as a second product for nurses and shift workers, so you have something else to offer the same buyers.
