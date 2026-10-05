@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="description" content="A private guide of positions and how-tos for a couple, with a surprise date-night generator, favorites, a tried/rating tracker and shared notes.">
+<meta name="description" content="A private guide for a couple: positions, a surprise date-night generator, spicy dares, and your own added ideas — with favorites, a tried/rating tracker and shared notes.">
 <style>
   :root { padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px); }
   html, body { margin: 0; }
@@ -69,6 +69,33 @@
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-wheel { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #fff; }
   .btn-date { background: var(--fg); color: var(--bg); }
+  .btn-dare { background: var(--accent-2); color: #fff; }
+  .btn-add { background: var(--surface); color: var(--fg); border: 1px solid var(--line); }
+
+  /* Shared modal shell for date / dare / add */
+  .modal { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-46%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; width: min(560px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 26px; }
+  .modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
+  .modal .close { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px; font-size: 18px; cursor: pointer; line-height: 1; }
+
+  /* Dares */
+  .dare-card { text-align: center; }
+  .dare-card .date-vibe { text-align: center; }
+  .dare-text { font-family: var(--font-display); font-size: 26px; line-height: 1.25; margin: 14px 0 6px; text-wrap: balance; }
+  .dare-meta { color: var(--muted); font-size: 13px; min-height: 16px; }
+
+  /* Add form */
+  .seg { display: flex; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin: 4px 0 18px; }
+  .seg button { flex: 1; border: none; background: none; color: var(--muted); font: inherit; font-weight: 600; font-size: 13px; padding: 8px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .field { margin-bottom: 13px; }
+  .field label { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 5px; }
+  .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 14px; }
+  .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .field textarea { resize: vertical; min-height: 56px; }
+  .field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .form-err { color: var(--red); font-size: 13px; min-height: 16px; margin-top: 2px; }
+  .remove-btn { border: 1px solid var(--line); background: var(--surface); color: var(--red); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .mine-badge { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 14%, transparent); padding: 2px 7px; border-radius: 999px; }
 
   /* Date-night card */
   .datebox { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-46%) scale(.97); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; width: min(560px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 26px; }
@@ -178,8 +205,10 @@
   <p class="sub">A private little guide to explore together — slow down, talk, and have fun.</p>
   <div class="actions">
     <button class="btn btn-date" id="openDate">💘 Surprise Date Night</button>
+    <button class="btn btn-dare" id="openDare">😈 Dares</button>
     <button class="btn btn-primary" id="surprise">✦ Surprise Us</button>
     <button class="btn btn-wheel" id="openWheel">🎡 Position Wheel</button>
+    <button class="btn btn-add" id="openAdd">➕ Add Your Own</button>
   </div>
   <div><span class="sync" id="sync"><span class="dot"></span><span id="syncLabel">Saved on this device</span></span></div>
 </header>
@@ -225,6 +254,33 @@
   <div class="date-actions">
     <button class="btn btn-date" id="dateShuffle">↻ Shuffle again</button>
     <button class="btn btn-primary" id="dateWheel">🎡 Pick a position</button>
+  </div>
+</div>
+
+<div class="modal dare-card" id="darebox" role="dialog" aria-modal="true" aria-label="Spicy dares">
+  <button class="close" id="dareClose" aria-label="Close">×</button>
+  <div class="date-vibe">Dare / prompt</div>
+  <div class="dare-text" id="dareText"></div>
+  <div class="dare-meta" id="dareMeta"></div>
+  <div class="date-actions" style="justify-content:center">
+    <button class="btn btn-dare" id="dareShuffle">↻ Another</button>
+    <button class="btn btn-add" id="dareRemove" hidden>Remove this</button>
+  </div>
+</div>
+
+<div class="modal" id="addbox" role="dialog" aria-modal="true" aria-label="Add your own">
+  <button class="close" id="addClose" aria-label="Close">×</button>
+  <h2 style="font-size:26px;margin-bottom:2px">Add your own</h2>
+  <p style="color:var(--muted);font-size:13px;margin:4px 0 0">Anything you add is shared with your partner.</p>
+  <div class="seg" id="addSeg">
+    <button data-type="position" aria-pressed="true">Position</button>
+    <button data-type="date" aria-pressed="false">Date idea</button>
+    <button data-type="dare" aria-pressed="false">Dare</button>
+  </div>
+  <div id="addFields"></div>
+  <div class="form-err" id="addErr"></div>
+  <div class="date-actions">
+    <button class="btn btn-primary" id="addSave">Add it</button>
   </div>
 </div>
 
@@ -316,6 +372,52 @@ const POSITIONS = [
     tips:["The wall is doing you a favor — lean into it so nobody's straining to stay upright.","A great opener that turns into being carried to the bed. Start here, finish there."] },
 ];
 
+const DARES = [
+  { text:"Give your partner a 2-minute kiss with no hands allowed." },
+  { text:"Blindfold your partner and feed them three things to guess." },
+  { text:"Give a 5-minute massage anywhere they ask — no skipping ahead." },
+  { text:"Whisper one thing you've been wanting to try." },
+  { text:"Slow dance to one whole song, lights low." },
+  { text:"Take turns: each name three things you find irresistible about the other." },
+  { text:"Trade phones and pick a playlist for the next 20 minutes." },
+  { text:"Undress your partner one item at a time, slowly." },
+  { text:"Set a 10-minute timer: kissing only, nothing more, until it rings." },
+  { text:"Describe your favorite memory of the two of you in detail." },
+  { text:"Let your partner give you one instruction you have to follow for the next 10 minutes." },
+  { text:"Recreate your very first kiss." },
+  { text:"Give your partner a lingering back-of-the-neck kiss right now." },
+  { text:"Pick a position from the app neither of you has tried and commit to it tonight." },
+  { text:"Send your partner a flirty text from across the room." },
+  { text:"Take turns tracing a fingertip anywhere for one minute — they guess what you're spelling." },
+  { text:"Tell your partner exactly what you want, out loud, no hints." },
+  { text:"Make eye contact for 60 seconds without laughing. Loser owes a favor." },
+  { text:"Give your partner control of the lights, music, and pace for the next 15 minutes." },
+  { text:"Kiss your partner somewhere you don't usually start." },
+];
+
+/* Custom (shared) content added by either partner. Merges with the built-ins. */
+const custom = { positions: {}, dates: {}, dares: {} };
+function loadCustomLocal() {
+  try { const c = JSON.parse(localStorage.getItem("closer-custom") || "null"); if (c) { custom.positions = c.positions || {}; custom.dates = c.dates || {}; custom.dares = c.dares || {}; } } catch (e) {}
+}
+function saveCustomLocal() { try { localStorage.setItem("closer-custom", JSON.stringify(custom)); } catch (e) {} }
+const positionsList = () => POSITIONS.concat(Object.values(custom.positions));
+const datesList = () => DATES.concat(Object.values(custom.dates));
+const daresList = () => DARES.concat(Object.values(custom.dares));
+
+async function addCustom(coll, obj) {
+  const id = "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  obj.id = id; obj.custom = true;
+  custom[coll][id] = obj;
+  saveCustomLocal(); render();
+  if (db && canWrite) { try { await db.doc(coll + "/" + id).set(obj); } catch (e) { if (e && (e.code === "invalid_argument" || e.code === "transform_error")) { canWrite = false; setSync("readonly"); } } }
+}
+async function removeCustom(coll, id) {
+  delete custom[coll][id];
+  saveCustomLocal(); render();
+  if (db && canWrite) { try { await db.doc(coll + "/" + id).delete(); } catch (e) {} }
+}
+
 const grid = document.getElementById("grid");
 const sheet = document.getElementById("sheet");
 const scrim = document.getElementById("scrim");
@@ -325,6 +427,14 @@ const chips = document.getElementById("chips");
 let activeFilter = "all";
 let query = "";
 let currentId = null; // open position in the sheet
+
+function overlayEls() { return [sheet, wheelbox, datebox, darebox, addbox]; }
+function anyOverlayOpen() { return overlayEls().some(m => m && m.classList.contains("open")); }
+function syncScrim() { if (anyOverlayOpen()) scrim.classList.add("open"); else scrim.classList.remove("open"); }
+function closeOverlaysExcept(keep) {
+  overlayEls().forEach(m => { if (m && m !== keep) m.classList.remove("open"); });
+  if (keep !== sheet) currentId = null;
+}
 
 /* ---------- Shared / local log ----------
    LOG[id] = { fav, tried, rating, note }. Lives in the db capability when
@@ -380,8 +490,21 @@ function setSync(mode) {
   else { label.textContent = "Saved on this device"; }
 }
 
+function subCustom(coll) {
+  db.collection(coll).onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      const id = ch.doc.id;
+      if (ch.type === "removed") delete custom[coll][id];
+      else custom[coll][id] = Object.assign({ id }, ch.doc.data());
+    });
+    saveCustomLocal();
+    render();
+  }, () => {});
+}
+
 async function initSync() {
   loadLocal();
+  loadCustomLocal();
   render();
   if (!(window.claude && typeof window.claude.use === "function")) { setSync("local"); return; }
   try { db = await claude.use("db"); } catch (e) { db = null; }
@@ -400,6 +523,10 @@ async function initSync() {
   }, err => {
     if (err && err.code === "revoked") { db = null; setSync("local"); }
   });
+  // Live subscriptions to shared custom content.
+  subCustom("positions");
+  subCustom("dates");
+  subCustom("dares");
 }
 
 function levelLabel(l) { return l.charAt(0).toUpperCase() + l.slice(1); }
@@ -411,7 +538,7 @@ function matches(p, filter) {
 }
 
 function render() {
-  const list = POSITIONS.filter(p => {
+  const list = positionsList().filter(p => {
     if (!matches(p, activeFilter)) return false;
     if (query) {
       const hay = (p.name + " " + p.blurb + " " + p.tags.join(" ")).toLowerCase();
@@ -434,7 +561,7 @@ function render() {
     const badges = `${isTried(p.id) ? '<span class="b" title="Tried">✓</span>' : ""}${ratingOf(p.id) ? `<span class="b rate" title="${ratingOf(p.id)} of 5">${"★".repeat(ratingOf(p.id))}</span>` : ""}`;
     card.innerHTML = `
       <button class="heart" aria-pressed="${isFav(p.id)}" aria-label="Save to favorites">♥</button>
-      <div class="row"><span class="level ${p.level}">${levelLabel(p.level)}</span></div>
+      <div class="row"><span class="level ${p.level}">${levelLabel(p.level)}</span>${p.custom ? '<span class="mine-badge">Yours</span>' : ""}</div>
       <h3>${p.name}</h3>
       <p class="blurb">${p.blurb}</p>
       <span class="tag">${p.tags.join(" · ")}</span>
@@ -454,17 +581,16 @@ function render() {
 }
 
 function openSheet(p) {
-  closeWheel();
-  closeDate();
+  closeOverlaysExcept(sheet);
   currentId = p.id;
   sheet.innerHTML = `
     <button class="close" id="closeBtn" aria-label="Close">×</button>
     <h2 id="sheet-title">${p.name}</h2>
-    <div class="meta"><span class="level ${p.level}">${levelLabel(p.level)}</span><span class="pill">Closeness: ${p.intimacy}</span></div>
+    <div class="meta"><span class="level ${p.level}">${levelLabel(p.level)}</span>${p.intimacy ? `<span class="pill">Closeness: ${p.intimacy}</span>` : ""}${p.custom ? '<span class="mine-badge">Yours</span>' : ""}</div>
     <p class="blurb" style="font-size:15px;color:var(--fg)">${p.blurb}</p>
-    <section><h4>How to do it</h4><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol></section>
-    <section><h4>Tips</h4><ul class="tips">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul></section>
-    <section><h4>Vibe</h4><div class="pill-row">${p.tags.map(t => `<span class="pill">${t}</span>`).join("")}</div></section>
+    ${(p.steps && p.steps.length) ? `<section><h4>How to do it</h4><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol></section>` : ""}
+    ${(p.tips && p.tips.length) ? `<section><h4>Tips</h4><ul class="tips">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul></section>` : ""}
+    ${(p.tags && p.tags.length) ? `<section><h4>Vibe</h4><div class="pill-row">${p.tags.map(t => `<span class="pill">${t}</span>`).join("")}</div></section>` : ""}
     <div class="tracker">
       <h4 style="color:var(--accent);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;font-weight:700">Your shared log</h4>
       <div class="tried-row">
@@ -476,8 +602,16 @@ function openSheet(p) {
       <textarea class="note" id="note" placeholder="Shared notes — what you both loved, what to try next time…">${noteOf(p.id).replace(/</g,"&lt;")}</textarea>
       <div class="note-saved" id="noteSaved"></div>
     </div>
+    ${p.custom ? `<div style="margin-top:16px"><button class="remove-btn" id="removePos">Remove this (you added it)</button></div>` : ""}
   `;
   sheet.querySelector("#closeBtn").addEventListener("click", closeSheet);
+  if (p.custom) {
+    const rm = sheet.querySelector("#removePos");
+    rm.addEventListener("click", () => {
+      if (rm.dataset.confirm) { removeCustom("positions", p.id); closeSheet(); }
+      else { rm.dataset.confirm = "1"; rm.textContent = "Tap again to remove"; }
+    });
+  }
 
   const triedBtn = sheet.querySelector("#triedBtn");
   triedBtn.addEventListener("click", () => {
@@ -512,8 +646,8 @@ function openSheet(p) {
     }, 450);
   });
 
-  scrim.classList.add("open");
   sheet.classList.add("open");
+  syncScrim();
   sheet.scrollTop = 0;
 }
 
@@ -533,12 +667,13 @@ function refreshSheetLive() {
 function closeSheet() {
   sheet.classList.remove("open");
   currentId = null;
-  if (!wheelbox.classList.contains("open")) scrim.classList.remove("open");
+  syncScrim();
   render();
 }
 
-scrim.addEventListener("click", () => { closeSheet(); closeWheel(); closeDate(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeSheet(); closeWheel(); closeDate(); } });
+function closeAllOverlays() { closeOverlaysExcept(null); currentId = null; syncScrim(); render(); }
+scrim.addEventListener("click", closeAllOverlays);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAllOverlays(); });
 
 chips.addEventListener("click", (e) => {
   const btn = e.target.closest(".chip");
@@ -550,8 +685,9 @@ chips.addEventListener("click", (e) => {
 search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); render(); });
 
 document.getElementById("surprise").addEventListener("click", () => {
-  const pool = POSITIONS.filter(p => matches(p, activeFilter) && (!query || (p.name + " " + p.blurb + " " + p.tags.join(" ")).toLowerCase().includes(query)));
-  const src = pool.length ? pool : POSITIONS;
+  const all = positionsList();
+  const pool = all.filter(p => matches(p, activeFilter) && (!query || (p.name + " " + p.blurb + " " + p.tags.join(" ")).toLowerCase().includes(query)));
+  const src = pool.length ? pool : all;
   openSheet(src[Math.floor(Math.random() * src.length)]);
 });
 
@@ -568,8 +704,9 @@ let spinning = false;
 const SLICE_COLORS = ["#b23a63","#8a2f7c","#c0607f","#9a4a86","#d1788f","#7a3a73"];
 
 function buildWheelItems() {
-  wheelItems = POSITIONS.filter(p => matches(p, wheelFilter));
-  if (wheelItems.length < 2) wheelItems = POSITIONS.slice();
+  const all = positionsList();
+  wheelItems = all.filter(p => matches(p, wheelFilter));
+  if (wheelItems.length < 2) wheelItems = all.slice();
 }
 function drawWheel() {
   const n = wheelItems.length, cx = 300, cy = 300, r = 300;
@@ -588,8 +725,8 @@ function drawWheel() {
   ctx.beginPath(); ctx.arc(cx, cy, 34, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
   ctx.fillStyle = "#b23a63"; ctx.font = "700 24px Fraunces, serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("♥", cx, cy + 1); ctx.textBaseline = "alphabetic";
 }
-function openWheel() { closeSheet(); buildWheelItems(); drawWheel(); wheelResult.innerHTML = ""; scrim.classList.add("open"); wheelbox.classList.add("open"); }
-function closeWheel() { wheelbox.classList.remove("open"); if (!sheet.classList.contains("open")) scrim.classList.remove("open"); }
+function openWheel() { closeOverlaysExcept(wheelbox); buildWheelItems(); drawWheel(); wheelResult.innerHTML = ""; wheelbox.classList.add("open"); syncScrim(); }
+function closeWheel() { wheelbox.classList.remove("open"); syncScrim(); }
 
 document.getElementById("openWheel").addEventListener("click", openWheel);
 document.getElementById("wheelClose").addEventListener("click", closeWheel);
@@ -648,14 +785,16 @@ let lastDateIdx = -1;
 
 function rollDate() {
   // avoid repeating the immediately previous idea
+  const dates = datesList();
   let idx;
-  do { idx = Math.floor(Math.random() * DATES.length); } while (DATES.length > 1 && idx === lastDateIdx);
+  do { idx = Math.floor(Math.random() * dates.length); } while (dates.length > 1 && idx === lastDateIdx);
   lastDateIdx = idx;
-  const d = DATES[idx];
+  const d = dates[idx];
 
   // nightcap: prefer a favorite, else any position
-  const favPool = POSITIONS.filter(p => isFav(p.id));
-  const pool = favPool.length ? favPool : POSITIONS;
+  const all = positionsList();
+  const favPool = all.filter(p => isFav(p.id));
+  const pool = favPool.length ? favPool : all;
   const cap = pool[Math.floor(Math.random() * pool.length)];
 
   dateContent.innerHTML = `
@@ -673,13 +812,105 @@ function rollDate() {
   capLink.addEventListener("click", () => openSheet(cap));
 }
 
-function openDate() { closeSheet(); closeWheel(); rollDate(); scrim.classList.add("open"); datebox.classList.add("open"); }
-function closeDate() { datebox.classList.remove("open"); if (!sheet.classList.contains("open") && !wheelbox.classList.contains("open")) scrim.classList.remove("open"); }
+function openDate() { closeOverlaysExcept(datebox); rollDate(); datebox.classList.add("open"); syncScrim(); }
+function closeDate() { datebox.classList.remove("open"); syncScrim(); }
 
 document.getElementById("openDate").addEventListener("click", openDate);
 document.getElementById("dateClose").addEventListener("click", closeDate);
 document.getElementById("dateShuffle").addEventListener("click", rollDate);
-document.getElementById("dateWheel").addEventListener("click", () => { closeDate(); openWheel(); });
+document.getElementById("dateWheel").addEventListener("click", () => { openWheel(); });
+
+/* ---------- Spicy Dares ---------- */
+const darebox = document.getElementById("darebox");
+const dareText = document.getElementById("dareText");
+const dareMeta = document.getElementById("dareMeta");
+const dareRemove = document.getElementById("dareRemove");
+let lastDareIdx = -1, currentDare = null;
+
+function rollDare() {
+  const list = daresList();
+  let idx;
+  do { idx = Math.floor(Math.random() * list.length); } while (list.length > 1 && idx === lastDareIdx);
+  lastDareIdx = idx;
+  currentDare = list[idx];
+  dareText.textContent = currentDare.text;
+  dareMeta.textContent = currentDare.custom ? "Added by you" : "";
+  dareRemove.hidden = !currentDare.custom;
+  dareRemove.dataset.confirm = "";
+  dareRemove.textContent = "Remove this";
+}
+function openDareModal() { closeOverlaysExcept(darebox); rollDare(); darebox.classList.add("open"); syncScrim(); }
+function closeDareModal() { darebox.classList.remove("open"); syncScrim(); }
+document.getElementById("openDare").addEventListener("click", openDareModal);
+document.getElementById("dareClose").addEventListener("click", closeDareModal);
+document.getElementById("dareShuffle").addEventListener("click", rollDare);
+dareRemove.addEventListener("click", () => {
+  if (!currentDare || !currentDare.custom) return;
+  if (dareRemove.dataset.confirm) { removeCustom("dares", currentDare.id); rollDare(); }
+  else { dareRemove.dataset.confirm = "1"; dareRemove.textContent = "Tap again to remove"; }
+});
+
+/* ---------- Add Your Own ---------- */
+const addbox = document.getElementById("addbox");
+const addFields = document.getElementById("addFields");
+const addErr = document.getElementById("addErr");
+const addSeg = document.getElementById("addSeg");
+let addType = "position";
+
+const FORMS = {
+  position: `
+    <div class="field"><label>Name</label><input id="f_name" maxlength="40" placeholder="What do you call it?"></div>
+    <div class="field"><label>Difficulty</label><select id="f_level"><option value="easy">Easy</option><option value="medium">Medium</option><option value="adventurous">Adventurous</option></select></div>
+    <div class="field"><label>Short description</label><textarea id="f_blurb" maxlength="240" placeholder="A line or two about it"></textarea></div>
+    <div class="field"><label>How to do it</label><textarea id="f_steps" placeholder="One step per line"></textarea><div class="hint">One step per line.</div></div>
+    <div class="field"><label>Tips (optional)</label><textarea id="f_tips" placeholder="One tip per line"></textarea></div>
+    <div class="field"><label>Vibe tags (optional)</label><input id="f_tags" placeholder="e.g. Cozy, Slow, Face-to-face"><div class="hint">Separate with commas.</div></div>`,
+  date: `
+    <div class="field"><label>Vibe</label><input id="f_vibe" maxlength="40" placeholder="e.g. Cozy night in"></div>
+    <div class="field"><label>Title</label><input id="f_title" maxlength="60" placeholder="Name the date"></div>
+    <div class="field"><label>Where to go</label><textarea id="f_where" maxlength="240" placeholder="The setting"></textarea></div>
+    <div class="field"><label>What to do</label><textarea id="f_what" maxlength="240" placeholder="The activity"></textarea></div>
+    <div class="field"><label>Little touch (optional)</label><textarea id="f_touch" maxlength="240" placeholder="A small thing to make it special"></textarea></div>`,
+  dare: `
+    <div class="field"><label>Your dare or prompt</label><textarea id="f_text" maxlength="200" placeholder="Write a playful dare or question…"></textarea></div>`,
+};
+
+function renderAddForm() {
+  addFields.innerHTML = FORMS[addType];
+  addErr.textContent = "";
+  [...addSeg.children].forEach(b => b.setAttribute("aria-pressed", b.dataset.type === addType));
+}
+function openAdd() { closeOverlaysExcept(addbox); addType = "position"; renderAddForm(); addbox.classList.add("open"); syncScrim(); }
+function closeAdd() { addbox.classList.remove("open"); syncScrim(); }
+const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+const lines = id => val(id).split("\n").map(s => s.trim()).filter(Boolean);
+
+document.getElementById("openAdd").addEventListener("click", openAdd);
+document.getElementById("addClose").addEventListener("click", closeAdd);
+addSeg.addEventListener("click", (e) => { const b = e.target.closest("button[data-type]"); if (!b) return; addType = b.dataset.type; renderAddForm(); });
+
+document.getElementById("addSave").addEventListener("click", () => {
+  addErr.textContent = "";
+  if (addType === "position") {
+    const name = val("f_name");
+    if (!name) { addErr.textContent = "Give it a name."; return; }
+    addCustom("positions", {
+      name, level: val("f_level") || "medium",
+      intimacy: "", blurb: val("f_blurb") || "Your own addition.",
+      steps: lines("f_steps"), tips: lines("f_tips"),
+      tags: val("f_tags") ? val("f_tags").split(",").map(s => s.trim()).filter(Boolean) : ["Yours"],
+    });
+  } else if (addType === "date") {
+    const title = val("f_title");
+    if (!title) { addErr.textContent = "Give the date a title."; return; }
+    addCustom("dates", { vibe: val("f_vibe") || "Your idea", title, where: val("f_where") || "Wherever you like.", what: val("f_what") || "Whatever you're in the mood for.", touch: val("f_touch") || "Make it yours." });
+  } else {
+    const text = val("f_text");
+    if (!text) { addErr.textContent = "Write something first."; return; }
+    addCustom("dares", { text });
+  }
+  closeAdd();
+});
 
 // Theme toggle (per-device)
 const themeBtn = document.getElementById("theme");
