@@ -25,6 +25,10 @@ Four video-sales-letter (VSL) funnels on one page, plus ready-to-post copy for e
 - Keep the disclosures in the page footers.
 - Don't use celebrity or brand names or likenesses to imply an endorsement.
 
+## Dropship store (`dropship/PLAYBOOK.md`)
+
+Pimple patch store on Shopify: supplier setup, unit economics, the math to $10k/month, 12 video scripts and a 30-day organic posting plan.
+
 ## Pocket Gram Scale (`scale/index.html`)
 
 A 0.00 g scale display: zero, tare, hold, units (g, ct, oz, ozt, dwt, gr), a spoons-to-grams spice converter, price per gram, calibration and a reading log with CSV copy.
