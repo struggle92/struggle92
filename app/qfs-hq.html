@@ -1,0 +1,628 @@
+<title>Quick Fix Studios HQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a workshop board. Left rail of tabs (bottom bar on phones), a work surface of panels. Tasks are numbered work orders. */
+:root{
+  --bg:#EDF0F2; --surface:#FFFFFF; --sunk:#E3E7EA; --line:#CDD4DA;
+  --ink:#15212C; --muted:#5A6874; --accent:#E2A21B; --accent-ink:#1A1405;
+  --in:#1D7A62; --out:#B8432C; --warn:#A86A00; --focus:#2F6FB3;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F151B; --surface:#17202A; --sunk:#111920; --line:#2A3743;
+  --ink:#E4EAEF; --muted:#94A3B0; --accent:#F0B43A; --accent-ink:#1A1405;
+  --in:#4CC39F; --out:#EE7A61; --warn:#E5A93A; --focus:#7FB2EA; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151B; --surface:#17202A; --sunk:#111920; --line:#2A3743;
+  --ink:#E4EAEF; --muted:#94A3B0; --accent:#F0B43A; --accent-ink:#1A1405;
+  --in:#4CC39F; --out:#EE7A61; --warn:#E5A93A; --focus:#7FB2EA; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100%}
+.rail{background:var(--ink);color:var(--bg);padding:20px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh}
+.brand{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:26px;line-height:.95;letter-spacing:.01em;text-transform:uppercase}
+.brand small{display:block;font:500 11px/1.4 var(--mono);letter-spacing:.12em;color:var(--accent);margin-top:6px}
+.tabs{display:flex;flex-direction:column;gap:2px}
+.tab{background:none;border:0;text-align:left;padding:9px 10px;border-radius:var(--r);color:inherit;opacity:.72;cursor:pointer;font-weight:500;display:flex;gap:10px;align-items:center}
+.tab:hover{opacity:1;background:rgba(127,127,127,.14)}
+.tab[aria-selected="true"]{opacity:1;background:var(--accent);color:var(--accent-ink)}
+.tab .k{font:500 11px var(--mono);opacity:.7;width:18px}
+.rail .foot{margin-top:auto;font:12px/1.5 var(--mono);opacity:.6}
+main{padding-block:24px 96px;padding-inline:clamp(16px,3vw,36px);min-width:0;max-width:1200px}
+h1{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1;margin:0 0 4px;text-transform:uppercase;text-wrap:balance}
+h2{font-family:var(--display);font-stretch:85%;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;margin:0;color:var(--muted)}
+.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.cols{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.panel-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .lbl{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font:600 26px/1.1 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .meta{font-size:12.5px;color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pos{color:var(--in)} .neg{color:var(--out)}
+.pill{display:inline-flex;align-items:center;gap:4px;font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.warn{color:var(--warn);border-color:currentColor}
+.pill.bad{color:var(--out);border-color:currentColor}
+.pill.good{color:var(--in);border-color:currentColor}
+.pill.hot{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.list{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:center;min-width:0}
+.row:first-child{border-top:0}
+.row .t{font-weight:500;min-width:0;overflow-wrap:anywhere}
+.row .m{font-size:12.5px;color:var(--muted);grid-column:1}
+.row .side{grid-row:1/span 2;grid-column:2;display:flex;gap:6px;align-items:center}
+.empty{color:var(--muted);font-size:14px;padding:6px 0;border:1px dashed var(--line);border-radius:var(--r);padding:14px;text-align:center}
+.btn{background:var(--sunk);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;cursor:pointer;font-weight:500;font-size:14px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted);padding:4px 6px}
+.btn.ghost:hover{color:var(--out)}
+.btn:disabled{opacity:.5;cursor:default}
+form.inline{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+form.inline .wide{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+input,select,textarea{background:var(--sunk);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:70px}
+.wo{font:500 12px var(--mono);color:var(--muted);margin-right:6px}
+.done .t{text-decoration:line-through;color:var(--muted)}
+.check{width:20px;height:20px;accent-color:var(--in);cursor:pointer}
+.status{font-size:12.5px;color:var(--muted)}
+.status.err{color:var(--out)}
+.banner{background:var(--sunk);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:var(--r);padding:10px 12px;font-size:14px}
+.stages{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;overflow-x:auto;padding-bottom:4px}
+.stage{background:var(--sunk);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:9px;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.card select{padding:3px 6px;font-size:12.5px}
+.script{white-space:pre-wrap;font-size:13.5px;background:var(--sunk);padding:10px;border-radius:var(--r);max-height:220px;overflow:auto}
+details summary{cursor:pointer;color:var(--muted);font-size:13px}
+.chat{display:flex;flex-direction:column;gap:10px;min-height:280px;max-height:60vh;overflow-y:auto;padding:4px}
+.msg{max-width:85%;padding:10px 12px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14.5px}
+.msg.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink)}
+.msg.ai{align-self:flex-start;background:var(--sunk)}
+.msg.note{align-self:center;background:none;color:var(--muted);font-size:12.5px}
+.chatbar{display:flex;gap:8px}
+.chatbar textarea{min-height:44px;flex:1}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:none;border:1px solid var(--line);border-radius:99px;padding:5px 10px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip:hover{color:var(--ink);border-color:var(--muted)}
+.focus-out{white-space:pre-wrap;font-size:14.5px}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .rail{position:fixed;bottom:0;top:auto;left:0;right:0;height:auto;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5;gap:0}
+  .brand,.rail .foot{display:none}
+  .tabs{flex-direction:row;width:100%;justify-content:space-between}
+  .tab{flex-direction:column;gap:0;font-size:11px;padding:6px 4px;flex:1;align-items:center;text-align:center}
+  .tab .k{display:none}
+  main{padding-block:16px 96px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Sections">
+    <div class="brand">Quick Fix<br>Studios<small>HQ · QFS</small></div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="today" id="t-today"><span class="k">01</span>Today</button>
+      <button class="tab" role="tab" data-tab="money" id="t-money"><span class="k">02</span>Money</button>
+      <button class="tab" role="tab" data-tab="work" id="t-work"><span class="k">03</span>Work</button>
+      <button class="tab" role="tab" data-tab="content" id="t-content"><span class="k">04</span>Content</button>
+      <button class="tab" role="tab" data-tab="clients" id="t-clients"><span class="k">05</span>Clients</button>
+      <button class="tab" role="tab" data-tab="ask" id="t-ask"><span class="k">06</span>Assistant</button>
+    </div>
+    <div class="foot" id="savedState">Connecting…</div>
+  </nav>
+
+  <main>
+    <div id="dbBanner" class="banner" hidden>Your records can't be saved in this view. Open this page in claude.ai while signed in to add or change anything.</div>
+
+    <!-- TODAY -->
+    <section data-panel="today">
+      <h1>Today</h1>
+      <p class="sub" id="todayDate"></p>
+      <div class="grid kpis">
+        <div class="kpi"><span class="lbl">Store sales · 7 days</span><span class="val" id="k-sales7">—</span><span class="meta" id="k-sales7m">Loading Shopify…</span></div>
+        <div class="kpi"><span class="lbl">Stripe balance</span><span class="val" id="k-stripe">—</span><span class="meta" id="k-stripem">Loading Stripe…</span></div>
+        <div class="kpi"><span class="lbl">Gemini</span><span class="val" id="k-gemini">—</span><span class="meta" id="k-geminim">Loading Gemini…</span></div>
+        <div class="kpi"><span class="lbl">Robinhood</span><span class="val" id="k-rh">—</span><span class="meta" id="k-rhm">Loading Robinhood…</span></div>
+        <div class="kpi"><span class="lbl">Net this month</span><span class="val" id="k-net">—</span><span class="meta" id="k-netm">From your money log</span></div>
+      </div>
+      <div class="grid cols" style="margin-top:14px">
+        <div class="panel">
+          <div class="panel-h"><h2>Today's focus</h2><button class="btn primary" id="focusBtn">What should I do today?</button></div>
+          <div class="focus-out" id="focusOut"><span class="status">Looks at your sales, open work orders and content queue, then names the 3 moves most likely to get a sale today.</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Open work orders</h2><button class="btn" data-go="work">All work</button></div>
+          <div class="list" id="todayTasks"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Store</h2><span class="status" id="storeStamp"></span></div>
+          <div class="list" id="storeList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Bills due in 7 days</h2><button class="btn" data-go="money">Money</button></div>
+          <div class="list" id="todaySubs"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MONEY -->
+    <section data-panel="money" hidden>
+      <h1>Money</h1>
+      <p class="sub">Every dollar in and out, plus what your subscriptions cost you each month.</p>
+      <div class="grid kpis">
+        <div class="kpi"><span class="lbl">In · this month</span><span class="val pos" id="m-in">$0.00</span></div>
+        <div class="kpi"><span class="lbl">Out · this month</span><span class="val neg" id="m-out">$0.00</span></div>
+        <div class="kpi"><span class="lbl">Net · this month</span><span class="val" id="m-net">$0.00</span></div>
+        <div class="kpi"><span class="lbl">Subscriptions / mo</span><span class="val" id="m-subs">$0.00</span><span class="meta" id="m-subsn"></span></div>
+      </div>
+      <div class="grid cols" style="margin-top:14px">
+        <div class="panel">
+          <h2>Log money</h2>
+          <form class="inline" id="moneyForm">
+            <label class="f">Type<select id="mf-kind"><option value="in">Money in</option><option value="out">Money out</option></select></label>
+            <label class="f">Amount ($)<input id="mf-amt" type="number" step="0.01" min="0" required></label>
+            <label class="f">Date<input id="mf-date" type="date" required></label>
+            <label class="f">Category<select id="mf-cat"><option>Sales</option><option>Client work</option><option>Payout</option><option>Inventory</option><option>Ads</option><option>Software</option><option>Shipping</option><option>Fees</option><option>Personal</option><option>Other</option></select></label>
+            <label class="f wide">Note<input id="mf-note" placeholder="e.g. 3 pairs sold on Marketplace"></label>
+            <button class="btn primary wide" type="submit">Add entry</button>
+          </form>
+          <div class="list" id="moneyList"></div>
+        </div>
+        <div class="panel">
+          <h2>Subscriptions & bills</h2>
+          <form class="inline" id="subForm">
+            <label class="f">Name<input id="sf-name" required placeholder="Shopify Basic"></label>
+            <label class="f">Amount ($)<input id="sf-amt" type="number" step="0.01" min="0" required></label>
+            <label class="f">Billed<select id="sf-cycle"><option value="monthly">Monthly</option><option value="yearly">Yearly</option><option value="weekly">Weekly</option></select></label>
+            <label class="f">Next due<input id="sf-due" type="date" required></label>
+            <button class="btn primary wide" type="submit">Add subscription</button>
+          </form>
+          <div class="list" id="subList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section data-panel="work" hidden>
+      <h1>Work orders</h1>
+      <p class="sub">Everything that has to get done, numbered like a shop ticket.</p>
+      <div class="grid cols">
+        <div class="panel">
+          <form class="inline" id="taskForm">
+            <label class="f wide">What needs doing<input id="tf-title" required placeholder="Post Marketplace listing A"></label>
+            <label class="f">Due<input id="tf-due" type="date"></label>
+            <label class="f">Priority<select id="tf-pri"><option value="2">Normal</option><option value="1">Urgent</option><option value="3">Someday</option></select></label>
+            <button class="btn primary wide" type="submit">Open work order</button>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Open</h2><span class="status" id="openCount"></span></div>
+          <div class="list" id="taskList"></div>
+          <details><summary id="doneSummary">Closed</summary><div class="list" id="doneList"></div></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section data-panel="content" hidden>
+      <h1>Content queue</h1>
+      <p class="sub">Shorts, TikToks, Reels and Marketplace posts — drafted, filmed, posted.</p>
+      <div class="grid cols">
+        <div class="panel">
+          <h2>Draft a post with AI</h2>
+          <form class="inline" id="draftForm">
+            <label class="f wide">Topic or angle<input id="df-topic" required placeholder="12-hour shift nurse POV, compression socks"></label>
+            <label class="f">Platform<select id="df-plat"><option>YouTube Shorts</option><option>TikTok</option><option>Instagram Reels</option><option>Facebook</option><option>FB Marketplace</option><option>Snapchat</option></select></label>
+            <button class="btn primary" type="submit" id="draftBtn">Draft it</button>
+          </form>
+          <div class="status" id="draftStatus"></div>
+          <h2 style="margin-top:6px">Or add your own</h2>
+          <form class="inline" id="contentForm">
+            <label class="f wide">Title<input id="cf-title" required></label>
+            <label class="f">Platform<select id="cf-plat"><option>YouTube Shorts</option><option>TikTok</option><option>Instagram Reels</option><option>Facebook</option><option>FB Marketplace</option><option>Snapchat</option></select></label>
+            <label class="f">Post on<input id="cf-date" type="date"></label>
+            <label class="f wide">Script / caption<textarea id="cf-script"></textarea></label>
+            <button class="btn wide" type="submit">Add to queue</button>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Queue</h2><span class="status" id="contentCount"></span></div>
+          <div class="list" id="contentList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section data-panel="clients" hidden>
+      <h1>Clients & leads</h1>
+      <p class="sub">Quick Fix Studios customers and prospects, from first contact to paid.</p>
+      <div class="panel" style="margin-bottom:14px">
+        <form class="inline" id="leadForm">
+          <label class="f">Name<input id="lf-name" required></label>
+          <label class="f">Contact<input id="lf-contact" placeholder="phone / email / @handle"></label>
+          <label class="f">Source<select id="lf-src"><option>Marketplace</option><option>TikTok</option><option>YouTube</option><option>Instagram</option><option>Facebook</option><option>Referral</option><option>Shopify</option><option>Other</option></select></label>
+          <label class="f">Worth ($)<input id="lf-val" type="number" min="0" step="1"></label>
+          <label class="f wide">Next step<input id="lf-next" placeholder="Send price for 5-pack"></label>
+          <button class="btn primary wide" type="submit">Add lead</button>
+        </form>
+      </div>
+      <div class="stages" id="stages"></div>
+    </section>
+
+    <!-- ASSISTANT -->
+    <section data-panel="ask" hidden>
+      <h1>Assistant</h1>
+      <p class="sub">Ask about your numbers, or tell it to log money, open work orders, add leads and draft posts.</p>
+      <div class="panel">
+        <div class="chat" id="chat" aria-live="polite"></div>
+        <div class="chips" id="chips">
+          <button class="chip">How much did I make this week?</button>
+          <button class="chip">Write 3 Marketplace listings for the socks</button>
+          <button class="chip">Log $59 in from a 3-pack sale today</button>
+          <button class="chip">What should I cut from my subscriptions?</button>
+        </div>
+        <form class="chatbar" id="chatForm">
+          <textarea id="chatIn" placeholder="Ask or tell me what to do…" rows="2"></textarea>
+          <div style="display:flex;flex-direction:column;gap:6px"><button class="btn primary" type="submit" id="sendBtn">Send</button><button class="btn" type="button" id="stopBtn" hidden>Stop</button></div>
+        </form>
+        <div class="status" id="chatStatus"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const STRIPE_ACCT = "acct_1UKBxdF9XnmaIYcQ";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const usd = n => (Number(n)||0).toLocaleString("en-US",{style:"currency",currency:"USD"});
+const today = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+const fmtDate = s => s ? new Date(s+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}) : "";
+const daysUntil = s => Math.round((new Date(s+"T12:00:00") - new Date(today()+"T12:00:00"))/864e5);
+
+const S = { money:[], subs:[], tasks:[], content:[], leads:[], live:{} };
+let db = null, sample = null, mcp = null;
+
+/* ---------- tabs ---------- */
+function show(tab){
+  document.querySelectorAll("[data-panel]").forEach(p => p.hidden = p.dataset.panel !== tab);
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.tab === tab)));
+  try{ localStorage.setItem("qfs-tab", tab); }catch(e){}
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => show(t.dataset.tab));
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => show(b.dataset.go));
+(function(){
+  const h = location.hash.slice(1); let saved = null;
+  try{ saved = localStorage.getItem("qfs-tab"); }catch(e){}
+  show(["today","money","work","content","clients","ask"].includes(h) ? h : (saved || "today"));
+})();
+$("#todayDate").textContent = new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
+["#mf-date"].forEach(s => $(s).value = today());
+
+/* ---------- db ---------- */
+const COLS = ["money","subs","tasks","content","leads"];
+async function add(col, data){
+  if(!db){ $("#dbBanner").hidden = false; throw new Error("no db"); }
+  try{ return await db.collection(col).add({ ...data, createdAt: Date.now() }); }
+  catch(e){ flash(e); throw e; }
+}
+async function patch(col, id, data){ if(!db) return; try{ await db.doc(col+"/"+id).update(data); }catch(e){ flash(e); } }
+async function remove(col, id){ if(!db) return; try{ await db.doc(col+"/"+id).delete(); }catch(e){ flash(e); } }
+function flash(e){
+  const map = {invalid_argument:"You don't have permission to change this.", quota_exceeded:"Storage is full. Delete old entries to add more.", resource_exhausted:"Too many changes at once. Wait a moment.", revoked:"Access to this page changed. Reload it."};
+  $("#savedState").textContent = map[e?.code] || "Couldn't save. Try again.";
+}
+function subscribeAll(){
+  for(const col of COLS){
+    db.collection(col).orderBy("createdAt","desc").onSnapshot(snap => {
+      S[col] = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderAll();
+    }, e => { $("#savedState").textContent = "Live sync stopped. Reload the page."; });
+  }
+}
+
+/* ---------- render ---------- */
+function monthTotals(){
+  const m = today().slice(0,7); let i=0,o=0;
+  for(const e of S.money){ if((e.date||"").slice(0,7)!==m) continue; if(e.kind==="in") i+=+e.amount||0; else o+=+e.amount||0; }
+  return {i,o,net:i-o};
+}
+const perMonth = s => s.cycle==="yearly" ? (+s.amount||0)/12 : s.cycle==="weekly" ? (+s.amount||0)*52/12 : (+s.amount||0);
+
+function renderMoney(){
+  const t = monthTotals();
+  $("#m-in").textContent = usd(t.i); $("#m-out").textContent = usd(t.o);
+  $("#m-net").textContent = usd(t.net); $("#m-net").className = "val " + (t.net>=0?"pos":"neg");
+  $("#k-net").textContent = usd(t.net); $("#k-net").className = "val " + (t.net>=0?"pos":"neg");
+  $("#k-netm").textContent = `${usd(t.i)} in · ${usd(t.o)} out`;
+  const sm = S.subs.reduce((a,s)=>a+perMonth(s),0);
+  $("#m-subs").textContent = usd(sm); $("#m-subsn").textContent = `${S.subs.length} active · ${usd(sm*12)}/yr`;
+  const ml = [...S.money].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  $("#moneyList").innerHTML = ml.length ? ml.slice(0,60).map(e => `
+    <div class="row"><span class="t">${esc(e.note||e.category)}</span>
+    <span class="m">${fmtDate(e.date)} · ${esc(e.category)}</span>
+    <span class="side"><span class="num ${e.kind==="in"?"pos":"neg"}">${e.kind==="in"?"+":"−"}${usd(e.amount)}</span><button class="btn ghost" aria-label="Delete entry" data-del="money/${e.id}">✕</button></span></div>`).join("")
+    : `<div class="empty">No entries yet. Log your first sale or expense above.</div>`;
+  const sl = [...S.subs].sort((a,b)=>(a.due||"").localeCompare(b.due||""));
+  $("#subList").innerHTML = sl.length ? sl.map(s => subRow(s, true)).join("")
+    : `<div class="empty">Add each app, membership and bill you pay so nothing renews by surprise.</div>`;
+  const soon = sl.filter(s => s.due && daysUntil(s.due) <= 7);
+  $("#todaySubs").innerHTML = soon.length ? soon.map(s => subRow(s,false)).join("") : `<div class="empty">Nothing due in the next 7 days.</div>`;
+}
+function subRow(s, del){
+  const d = s.due ? daysUntil(s.due) : null;
+  const pill = d===null ? "" : d<0 ? `<span class="pill bad">${-d}d overdue</span>` : d===0 ? `<span class="pill warn">due today</span>` : d<=7 ? `<span class="pill warn">in ${d}d</span>` : `<span class="pill">${fmtDate(s.due)}</span>`;
+  return `<div class="row"><span class="t">${esc(s.name)}</span><span class="m num">${usd(s.amount)} ${esc(s.cycle)}</span>
+  <span class="side">${pill}${del?`<button class="btn ghost" aria-label="Delete subscription" data-del="subs/${s.id}">✕</button>`:""}</span></div>`;
+}
+
+function woNum(t){ const all=[...S.tasks].sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)); return "WO-"+String(all.indexOf(t)+1).padStart(4,"0"); }
+function taskRow(t, compact){
+  const d = t.due ? daysUntil(t.due) : null;
+  const pri = t.priority==1 ? `<span class="pill hot">urgent</span>` : "";
+  const due = d===null||t.done ? "" : d<0 ? `<span class="pill bad">${-d}d late</span>` : d===0 ? `<span class="pill warn">today</span>` : `<span class="pill">${fmtDate(t.due)}</span>`;
+  return `<div class="row ${t.done?"done":""}"><span class="t"><span class="wo">${woNum(t)}</span>${esc(t.title)}</span>
+  ${t.note?`<span class="m">${esc(t.note)}</span>`:""}
+  <span class="side">${pri}${due}<input type="checkbox" class="check" aria-label="Mark done" data-done="${t.id}" ${t.done?"checked":""}>${compact?"":`<button class="btn ghost" aria-label="Delete work order" data-del="tasks/${t.id}">✕</button>`}</span></div>`;
+}
+function renderTasks(){
+  const open = S.tasks.filter(t=>!t.done).sort((a,b)=>(a.priority||2)-(b.priority||2) || (a.due||"9").localeCompare(b.due||"9"));
+  const done = S.tasks.filter(t=>t.done);
+  $("#taskList").innerHTML = open.length ? open.map(t=>taskRow(t)).join("") : `<div class="empty">No open work orders.</div>`;
+  $("#doneList").innerHTML = done.map(t=>taskRow(t)).join("");
+  $("#doneSummary").textContent = `Closed (${done.length})`;
+  $("#openCount").textContent = `${open.length} open`;
+  $("#todayTasks").innerHTML = open.length ? open.slice(0,5).map(t=>taskRow(t,true)).join("") : `<div class="empty">Nothing open. Add a work order.</div>`;
+}
+
+const STATUSES = ["Idea","Scripted","Filmed","Posted"];
+function renderContent(){
+  const order = s => STATUSES.indexOf(s.status||"Idea");
+  const list = [...S.content].sort((a,b)=> order(a)-order(b) || (a.date||"9").localeCompare(b.date||"9"));
+  $("#contentCount").textContent = `${list.filter(c=>c.status!=="Posted").length} not posted`;
+  $("#contentList").innerHTML = list.length ? list.map(c => `
+    <div class="row"><span class="t">${esc(c.title)}</span>
+    <span class="m">${esc(c.platform)}${c.date?" · "+fmtDate(c.date):""}</span>
+    <span class="side"><select aria-label="Status" data-status="${c.id}">${STATUSES.map(s=>`<option ${s===(c.status||"Idea")?"selected":""}>${s}</option>`).join("")}</select><button class="btn ghost" aria-label="Delete post" data-del="content/${c.id}">✕</button></span>
+    ${c.script?`<details style="grid-column:1/-1"><summary>Script & caption</summary><div class="script">${esc(c.script)}</div></details>`:""}</div>`).join("")
+    : `<div class="empty">Queue is empty. Draft a post with AI or add one.</div>`;
+}
+
+const STAGES = ["New","Contacted","Talking","Won","Lost"];
+function renderLeads(){
+  $("#stages").innerHTML = STAGES.map(st => {
+    const items = S.leads.filter(l => (l.stage||"New")===st);
+    const total = items.reduce((a,l)=>a+(+l.value||0),0);
+    return `<div class="stage"><div class="panel-h"><h2>${st}</h2><span class="num status">${items.length}${total?" · "+usd(total):""}</span></div>
+    ${items.map(l => `<div class="card"><strong>${esc(l.name)}</strong>
+      ${l.contact?`<span class="status">${esc(l.contact)}</span>`:""}
+      <span class="status">${esc(l.source||"")}${l.value?" · "+usd(l.value):""}</span>
+      ${l.next?`<span>→ ${esc(l.next)}</span>`:""}
+      <div style="display:flex;gap:6px;align-items:center"><select aria-label="Stage" data-stage="${l.id}">${STAGES.map(s=>`<option ${s===st?"selected":""}>${s}</option>`).join("")}</select><button class="btn ghost" aria-label="Delete lead" data-del="leads/${l.id}">✕</button></div></div>`).join("")
+      || `<span class="status">—</span>`}</div>`;
+  }).join("");
+}
+function renderAll(){ renderMoney(); renderTasks(); renderContent(); renderLeads(); }
+
+/* delegated actions */
+document.addEventListener("click", e => {
+  const del = e.target.closest("[data-del]");
+  if(del){
+    if(del.dataset.armed){ const [c,id]=del.dataset.del.split("/"); remove(c,id); }
+    else { del.dataset.armed="1"; del.textContent="Delete?"; setTimeout(()=>{ if(del.isConnected){ delete del.dataset.armed; del.textContent="✕"; } },3000); }
+  }
+});
+document.addEventListener("change", e => {
+  const t=e.target;
+  if(t.dataset.done) patch("tasks", t.dataset.done, { done: t.checked, doneAt: t.checked?Date.now():null });
+  if(t.dataset.status) patch("content", t.dataset.status, { status: t.value });
+  if(t.dataset.stage) patch("leads", t.dataset.stage, { stage: t.value });
+});
+
+/* forms */
+$("#moneyForm").onsubmit = async e => { e.preventDefault();
+  await add("money",{ kind:$("#mf-kind").value, amount:+$("#mf-amt").value, date:$("#mf-date").value, category:$("#mf-cat").value, note:$("#mf-note").value.trim() }).catch(()=>{});
+  $("#mf-amt").value=""; $("#mf-note").value=""; };
+$("#subForm").onsubmit = async e => { e.preventDefault();
+  await add("subs",{ name:$("#sf-name").value.trim(), amount:+$("#sf-amt").value, cycle:$("#sf-cycle").value, due:$("#sf-due").value }).catch(()=>{});
+  e.target.reset(); };
+$("#taskForm").onsubmit = async e => { e.preventDefault();
+  await add("tasks",{ title:$("#tf-title").value.trim(), due:$("#tf-due").value||null, priority:+$("#tf-pri").value, done:false }).catch(()=>{});
+  e.target.reset(); };
+$("#contentForm").onsubmit = async e => { e.preventDefault();
+  await add("content",{ title:$("#cf-title").value.trim(), platform:$("#cf-plat").value, date:$("#cf-date").value||null, script:$("#cf-script").value, status:"Idea" }).catch(()=>{});
+  e.target.reset(); };
+$("#leadForm").onsubmit = async e => { e.preventDefault();
+  await add("leads",{ name:$("#lf-name").value.trim(), contact:$("#lf-contact").value.trim(), source:$("#lf-src").value, value:+$("#lf-val").value||0, next:$("#lf-next").value.trim(), stage:"New" }).catch(()=>{});
+  e.target.reset(); };
+
+/* ---------- live data (connectors) ---------- */
+const errCopy = (code, server) => ({
+  needs_reauth:`Reconnect ${server} in claude.ai Settings → Connectors.`,
+  server_not_connected:`Add ${server} in claude.ai Settings → Connectors.`,
+  selection_required:`Pick which ${server} account to use.`,
+  not_in_manifest:`${server} is turned off for this page.`,
+  blocked_by_policy:`${server} is blocked by your organization.`,
+  approval_required:`${server} needs approval for this page.`,
+  server_unavailable:`${server} isn't answering right now. It will refresh on its own.`,
+  not_granted:`Live data is off in this view.`, capability_disabled:`Live data is off in this view.`,
+  tool_error:`${server} reported an error.`
+}[code] || `${server} couldn't load.`);
+const RETRACT = new Set(["needs_reauth","server_not_connected","blocked_by_policy","approval_required","not_in_manifest","selection_required"]);
+const stamp = r => { const t = r?.cache?.storedAt || Date.now(); return "Updated " + new Date(t).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}); };
+function parseLoose(p){
+  if(p && typeof p === "object") return p;
+  if(typeof p !== "string") return null;
+  const a = p.search(/[\[{]/), b = Math.max(p.lastIndexOf("]"), p.lastIndexOf("}"));
+  if(a<0||b<a) return null;
+  try{ return JSON.parse(p.slice(a,b+1)); }catch(e){ return null; }
+}
+function watch(server, tool, input, onData, valEl, metaEl, opts){
+  return mcp.watchTool(server, tool, input, ev => {
+    if(ev.type === "data"){ try{ onData(ev.result.payload, ev.result); }catch(err){ $(metaEl).textContent = `${server} sent something unexpected.`; } }
+    else { if(RETRACT.has(ev.error.code)) $(valEl).textContent = "—"; $(metaEl).textContent = errCopy(ev.error.code, server); $(metaEl).classList.add("err"); }
+  }, opts || { refetchInterval: 300000 });
+}
+function startLive(){
+  // Shopify orders
+  watch("Shopify","list-orders",{ first:50 }, (p, r) => {
+    const orders = p?.orders || [];
+    const now = Date.now(), sum = ms => orders.filter(o => now - Date.parse(o.createdAt) <= ms).reduce((a,o)=>a+(+o.totalPrice||0),0);
+    const n7 = orders.filter(o => now - Date.parse(o.createdAt) <= 7*864e5).length;
+    S.live.shopify = { revenue24h: sum(864e5), revenue7d: sum(7*864e5), revenue30d: sum(30*864e5), orders7d: n7, totalOrders: p?.totalCount ?? orders.length,
+      recent: orders.slice(0,5).map(o=>({ name:o.name, total:o.totalPrice, at:o.createdAt, paid:o.financialStatus, fulfilled:o.fulfillmentStatus })) };
+    $("#k-sales7").textContent = usd(S.live.shopify.revenue7d);
+    $("#k-sales7m").classList.remove("err");
+    $("#k-sales7m").textContent = `${n7} order${n7===1?"":"s"} · ${usd(S.live.shopify.revenue24h)} today · ${stamp(r)}`;
+  }, "#k-sales7", "#k-sales7m");
+  // Shopify products + inventory
+  watch("Shopify","search_products",{ first:20, search_query:"status:active", search_summary:"Active products" }, (p, r) => {
+    const edges = p?.data?.products?.edges || [];
+    S.live.products = edges.map(e => ({ title:e.node.title, price:e.node.priceRangeV2?.minVariantPrice?.amount, stock:e.node.totalInventory }));
+    $("#storeStamp").textContent = stamp(r);
+    $("#storeList").innerHTML = S.live.products.length ? S.live.products.map(x => `
+      <div class="row"><span class="t">${esc(x.title)}</span><span class="m num">${usd(x.price)}</span>
+      <span class="side">${x.stock<10?`<span class="pill warn">${x.stock} left</span>`:`<span class="pill good">${x.stock} in stock</span>`}</span></div>`).join("")
+      : `<div class="empty">No active products in your store.</div>`;
+  }, "#storeStamp", "#storeStamp");
+  // Stripe
+  watch("Stripe","stripe_api_read",{ stripe_api_operation_id:"GetBalance", stripe_context:STRIPE_ACCT, livemode:false }, (p, r) => {
+    const b = parseLoose(p) || {};
+    const avail = (b.available||[]).reduce((a,x)=>a+(x.amount||0),0)/100, pend = (b.pending||[]).reduce((a,x)=>a+(x.amount||0),0)/100;
+    S.live.stripe = { available: avail, pending: pend, livemode: !!b.livemode };
+    $("#k-stripe").textContent = usd(avail);
+    $("#k-stripem").innerHTML = `${usd(pend)} pending · ${b.livemode?"live":`<span class="pill warn">test mode</span>`}`;
+  }, "#k-stripe", "#k-stripem");
+  // Gemini
+  watch("Gemini","gemini_list_balances",{}, (p, r) => {
+    const rows = parseLoose(p) || [];
+    const arr = Array.isArray(rows) ? rows : (rows.balances || []);
+    const total = arr.reduce((a,x)=>a+(+x.amountNotional||0),0);
+    S.live.gemini = { totalUsd: total, assets: arr.map(x=>({ currency:x.currency, amount:x.amount, usd:x.amountNotional })) };
+    $("#k-gemini").textContent = usd(total);
+    $("#k-geminim").textContent = `${arr.map(x=>x.currency).join(", ")||"No assets"} · ${stamp(r)}`;
+  }, "#k-gemini", "#k-geminim");
+  // Robinhood: find the account this page can read, then watch its portfolio
+  mcp.callTool("Robinhood","get_accounts",{}).then(r => {
+    const accts = r.payload?.data?.accounts || [];
+    const a = accts.find(x => x.agentic_allowed) || accts.find(x => x.is_default);
+    if(!a){ $("#k-rhm").textContent = "No readable account."; return; }
+    watch("Robinhood","get_portfolio",{ account_number:a.account_number }, (p, r2) => {
+      const d = p?.data || {};
+      S.live.robinhood = { account: a.nickname || a.brokerage_account_type, total:+d.total_value||0, cash:+d.cash||0, crypto:+d.crypto_value||0, stocks:+d.equity_value||0, buyingPower:+(d.buying_power?.buying_power)||0 };
+      $("#k-rh").textContent = usd(d.total_value);
+      $("#k-rhm").textContent = `${a.nickname||"Account"} ••${a.account_number.slice(-4)} · ${usd(d.buying_power?.buying_power)} to spend`;
+    }, "#k-rh", "#k-rhm");
+  }).catch(e => { $("#k-rhm").textContent = errCopy(e.code, "Robinhood"); $("#k-rhm").classList.add("err"); });
+}
+
+/* ---------- AI ---------- */
+const BIZ = `Business: Quick Fix Studios, LLC (store brand "QFS", qfs1-store.myshopify.com). Main product: Graduated Compression Socks, $25/pair, for nurses / 12-hour shifts, long flights, leg-day recovery. Live codes: LEGS15 (15% off, ends Oct 11) and STOCKUP20 (20% off 3+ pairs). Sells via Shopify, Facebook Marketplace, YouTube Shorts, TikTok, Reels, Snapchat. Owner wants blunt, practical advice that leads to sales. Never make medical claims (no "treats/cures/prevents clots").`;
+function snapshot(){
+  const t = monthTotals();
+  return {
+    today: today(), live: S.live,
+    moneyThisMonth: { in:t.i, out:t.o, net:t.net },
+    subscriptionsPerMonth: +S.subs.reduce((a,s)=>a+perMonth(s),0).toFixed(2),
+    subscriptions: S.subs.map(s=>({ name:s.name, amount:s.amount, cycle:s.cycle, due:s.due })),
+    openWorkOrders: S.tasks.filter(x=>!x.done).map(x=>({ title:x.title, due:x.due, urgent:x.priority==1 })),
+    contentQueue: S.content.map(c=>({ title:c.title, platform:c.platform, status:c.status, date:c.date })),
+    leads: S.leads.map(l=>({ name:l.name, stage:l.stage, value:l.value, next:l.next, source:l.source })),
+    recentMoney: [...S.money].slice(0,25).map(e=>({ kind:e.kind, amount:e.amount, date:e.date, category:e.category, note:e.note }))
+  };
+}
+const sErr = c => ({ not_granted:"AI is turned off for this page.", sampling_disabled:"AI isn't available on this account.", rate_limited:"Too many requests. Try again in a minute.", session_expired:"Sign in to claude.ai again.", refused:"That request was declined. Rephrase it.", invalid_json:"The draft came back garbled. Try again." }[c] || "Something went wrong. Try again.");
+
+$("#focusBtn").onclick = async () => {
+  if(!sample){ $("#focusOut").textContent = "AI isn't available in this view."; return; }
+  const b=$("#focusBtn"); b.disabled=true; $("#focusOut").textContent = "Thinking…";
+  try{
+    await sample(`${BIZ}\n\nHere is the business right now (JSON):\n${JSON.stringify(snapshot()).slice(0,12000)}\n\nGive exactly 3 numbered moves for today, most likely to produce a sale first. Each: one bold-free line saying what to do, then one short line why. Be blunt — call out anything being neglected. Plain text, no markdown headings.`,
+      { cache:false, onText:({text}) => { $("#focusOut").textContent = text; } });
+  }catch(e){ $("#focusOut").textContent = e.text || sErr(e.code); }
+  b.disabled=false;
+};
+
+$("#draftForm").onsubmit = async e => { e.preventDefault();
+  if(!sample){ $("#draftStatus").textContent = "AI isn't available in this view."; return; }
+  const btn=$("#draftBtn"); btn.disabled=true; $("#draftStatus").textContent = "Drafting… (10–40s)";
+  const plat=$("#df-plat").value, topic=$("#df-topic").value.trim();
+  try{
+    const d = await sample.json(`${BIZ}\n\nWrite one ${plat} post about: ${topic}.\nReply with only JSON: {"title": string (under 50 chars, hook first), "script": string (shot-by-shot with timestamps for video, or the full listing text for Marketplace/Facebook), "caption": string, "hashtags": string}.`, { cache:false });
+    await add("content",{ title:String(d.title||topic).slice(0,120), platform:plat, status:"Scripted", date:null,
+      script:`${d.script||""}\n\nCaption: ${d.caption||""}\n${d.hashtags||""}`.trim() });
+    $("#draftStatus").textContent = "Added to your queue."; $("#df-topic").value="";
+  }catch(err){ $("#draftStatus").textContent = sErr(err.code); }
+  btn.disabled=false;
+};
+
+/* chat */
+const turns = [];
+const RULES = `${BIZ}\nYou are the owner's business assistant inside their Quick Fix Studios HQ app. Use the tools to read live numbers and records and to add records when asked. Dates are YYYY-MM-DD; today is ${today()}. Confirm what you saved in one line. Keep answers short and concrete. Plain text, no markdown tables.`;
+function bubble(cls, text){ const d=document.createElement("div"); d.className="msg "+cls; d.textContent=text; $("#chat").append(d); $("#chat").scrollTop=1e9; return d; }
+bubble("note","Ask about your numbers or tell me to log something.");
+const tools = [
+  { name:"get_business_snapshot", description:"Returns live store sales, Stripe/Gemini/Robinhood balances, this month's money totals, subscriptions, open work orders, content queue and leads.", execute:()=>snapshot() },
+  { name:"log_money", description:"Log money in or out. Returns the saved entry.", inputSchema:{type:"object",properties:{kind:{enum:["in","out"]},amount:{type:"number"},date:{type:"string"},category:{type:"string"},note:{type:"string"}},required:["kind","amount"]},
+    execute: async i => { const e={ kind:i.kind==="out"?"out":"in", amount:Math.abs(+i.amount||0), date:String(i.date||today()), category:String(i.category||"Other"), note:String(i.note||"") }; await add("money",e); return e; } },
+  { name:"add_subscription", description:"Add a subscription or recurring bill.", inputSchema:{type:"object",properties:{name:{type:"string"},amount:{type:"number"},cycle:{enum:["monthly","yearly","weekly"]},due:{type:"string"}},required:["name","amount"]},
+    execute: async i => { const s={ name:String(i.name), amount:+i.amount||0, cycle:["monthly","yearly","weekly"].includes(i.cycle)?i.cycle:"monthly", due:String(i.due||today()) }; await add("subs",s); return s; } },
+  { name:"add_work_order", description:"Open a work order (task).", inputSchema:{type:"object",properties:{title:{type:"string"},due:{type:"string"},urgent:{type:"boolean"}},required:["title"]},
+    execute: async i => { const t={ title:String(i.title), due:i.due?String(i.due):null, priority:i.urgent?1:2, done:false }; await add("tasks",t); return t; } },
+  { name:"add_lead", description:"Add a client or lead to the pipeline.", inputSchema:{type:"object",properties:{name:{type:"string"},contact:{type:"string"},source:{type:"string"},value:{type:"number"},next:{type:"string"}},required:["name"]},
+    execute: async i => { const l={ name:String(i.name), contact:String(i.contact||""), source:String(i.source||"Other"), value:+i.value||0, next:String(i.next||""), stage:"New" }; await add("leads",l); return l; } },
+  { name:"add_content", description:"Save a post/script to the content queue.", inputSchema:{type:"object",properties:{title:{type:"string"},platform:{type:"string"},script:{type:"string"},date:{type:"string"}},required:["title","platform"]},
+    execute: async i => { const c={ title:String(i.title), platform:String(i.platform), script:String(i.script||""), date:i.date?String(i.date):null, status:"Scripted" }; await add("content",c); return { saved:c.title }; } }
+];
+let ctl = null, canTools = false;
+async function send(text){
+  if(!text.trim()) return;
+  if(!sample){ bubble("note","AI isn't available in this view."); return; }
+  bubble("me", text); turns.push({ role:"user", content:text });
+  while(turns.length > 16) turns.shift();
+  const out = bubble("ai","Thinking…");
+  ctl = new AbortController(); $("#sendBtn").disabled = true; $("#stopBtn").hidden = false;
+  try{
+    const opts = { cache:false, signal:ctl.signal, onText:({text}) => { out.textContent = text; $("#chat").scrollTop=1e9; } };
+    let input = [{ role:"user", content:RULES }, ...turns];
+    if(canTools) opts.tools = tools;
+    else input = [{ role:"user", content: RULES + "\n\nCurrent data:\n" + JSON.stringify(snapshot()).slice(0,12000) }, ...turns];
+    const { text:ans } = await sample(input, opts);
+    turns.push({ role:"assistant", content:ans });
+  }catch(e){
+    out.textContent = e.text || (e.code==="cancelled" ? "Stopped." : sErr(e.code));
+    if(e.text) turns.push({ role:"assistant", content:e.text });
+  }
+  $("#sendBtn").disabled = false; $("#stopBtn").hidden = true;
+}
+$("#chatForm").onsubmit = e => { e.preventDefault(); const v=$("#chatIn").value; $("#chatIn").value=""; send(v); };
+$("#chatIn").addEventListener("keydown", e => { if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); $("#chatForm").requestSubmit(); } });
+$("#stopBtn").onclick = () => ctl?.abort();
+$("#chips").addEventListener("click", e => { const c=e.target.closest(".chip"); if(c) send(c.textContent); });
+
+/* ---------- boot ---------- */
+renderAll();
+(async () => {
+  const c = window.claude;
+  if(!c?.use){ $("#savedState").textContent = "Open in claude.ai to use"; $("#dbBanner").hidden=false; return; }
+  const [d, m, s] = await Promise.all([c.use("db"), c.use("mcp"), c.use("sample")]);
+  db = d; mcp = m; sample = s;
+  if(db){ subscribeAll(); $("#savedState").textContent = "Saved to your HQ"; } else { $("#dbBanner").hidden = false; $("#savedState").textContent = "Read-only view"; }
+  if(mcp) startLive(); else ["#k-sales7m","#k-stripem","#k-geminim","#k-rhm"].forEach(x => $(x).textContent = "Live data is off in this view.");
+  if(sample){ const lim = await sample.limits().catch(()=>null); canTools = !!lim?.tools; }
+  else { $("#focusBtn").disabled = true; $("#draftBtn").disabled = true; }
+})();
+</script>
