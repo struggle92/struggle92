@@ -1,0 +1,7 @@
+@import url("../style.css");
+body{position:relative}
+.s{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:110px 90px;opacity:0}
+@keyframes show{0%{opacity:0;transform:translateY(40px) scale(.96)}8%{opacity:1;transform:none}92%{opacity:1}100%{opacity:0}}
+@keyframes showlast{0%{opacity:0;transform:scale(.9)}10%{opacity:1;transform:none}100%{opacity:1}}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pop{animation:pop .5s both}
