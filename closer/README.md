@@ -11,13 +11,19 @@ spin wheel.
 - **Favorites** — tap the ♥ on any card.
 - **Surprise Us** — random pick from the current filter/search.
 - **Date-Night Wheel** — spin to let it choose, with its own filters.
-- **Your log** — mark positions as tried, rate them 1–5 stars, and keep private notes.
+- **Shared log** — mark positions as tried, rate them 1–5 stars, and keep notes.
 
-## Privacy
+## How the log syncs
 
-Everything you save (favorites, tried, ratings, notes, theme) lives in the
-browser's `localStorage` on that one device only. Nothing is sent anywhere,
-there is no account, and no server stores any of it. Clearing site data wipes it.
+- **Opened inside Claude** (the published artifact): the log (favorites, tried,
+  ratings, notes) is stored in the artifact's shared database, so both partners
+  see each other's changes live. To let a second person write, the owner invites
+  them by email as an editor/contributor from the artifact's Share menu (not via
+  a public link).
+- **Opened anywhere else** (e.g. a static host like this file on its own): there
+  is no Claude runtime, so the app falls back to the browser's `localStorage` and
+  the log is saved on that one device only. The header shows which mode is active.
+- Theme choice is always per-device. No third-party servers are involved either way.
 
 ## Run it
 

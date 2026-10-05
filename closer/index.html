@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<meta name="description" content="A private guide of positions and how-tos for a couple, with favorites, a tried/rating tracker and private notes. Everything stays on your device.">
+<meta name="description" content="A private guide of positions and how-tos for a couple, with favorites, a tried/rating tracker and shared notes.">
 <style>
   :root { padding: env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px); }
   html, body { margin: 0; }
@@ -16,6 +16,7 @@
 <style>
   /* Layout: warm, intimate single-column reader with a sticky filter bar, a
      slide-in detail sheet, and a full-screen spin-the-wheel date-night mode.
+     Shared log syncs between partners via the db capability.
      Palette leans dusky rose + deep plum on warm charcoal. */
   :root {
     --bg: #f7f0ee;
@@ -38,228 +39,117 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #17080d;
-      --surface: #241219;
-      --surface-2: #311720;
-      --fg: #f3e4e7;
-      --muted: #b792a0;
-      --line: #3b1f29;
-      --accent: #e56b94;
-      --accent-2: #c66bbb;
-      --accent-soft: #3a1b26;
-      --gold: #d9a85c;
-      --green: #6fb991;
-      --amber: #d9a85c;
-      --red: #e07a62;
-      --shadow: 0 16px 40px -14px rgba(0,0,0,.6);
-      color-scheme: dark;
+      --bg: #17080d; --surface: #241219; --surface-2: #311720; --fg: #f3e4e7;
+      --muted: #b792a0; --line: #3b1f29; --accent: #e56b94; --accent-2: #c66bbb;
+      --accent-soft: #3a1b26; --gold: #d9a85c; --green: #6fb991; --amber: #d9a85c;
+      --red: #e07a62; --shadow: 0 16px 40px -14px rgba(0,0,0,.6); color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #17080d;
-    --surface: #241219;
-    --surface-2: #311720;
-    --fg: #f3e4e7;
-    --muted: #b792a0;
-    --line: #3b1f29;
-    --accent: #e56b94;
-    --accent-2: #c66bbb;
-    --accent-soft: #3a1b26;
-    --gold: #d9a85c;
-    --green: #6fb991;
-    --amber: #d9a85c;
-    --red: #e07a62;
-    --shadow: 0 16px 40px -14px rgba(0,0,0,.6);
-    color-scheme: dark;
+    --bg: #17080d; --surface: #241219; --surface-2: #311720; --fg: #f3e4e7;
+    --muted: #b792a0; --line: #3b1f29; --accent: #e56b94; --accent-2: #c66bbb;
+    --accent-soft: #3a1b26; --gold: #d9a85c; --green: #6fb991; --amber: #d9a85c;
+    --red: #e07a62; --shadow: 0 16px 40px -14px rgba(0,0,0,.6); color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font-body);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
   h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; }
-
   .wrap { max-width: 760px; margin: 0 auto; padding-inline: 20px; }
 
   header { padding-block: 34px 10px; text-align: center; }
-  .eyebrow {
-    font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
-    color: var(--accent); font-weight: 600; margin-bottom: 10px;
-  }
+  .eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
   header h1 { font-size: clamp(38px, 11vw, 58px); line-height: .98; font-weight: 500; }
-  header h1 em { font-style: italic; color: var(--accent); }
   .sub { color: var(--muted); margin-top: 12px; font-size: 15px; }
 
   .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 18px; }
-  .btn {
-    border: none; border-radius: 999px; padding: 11px 20px; font-size: 14px; font-weight: 600;
-    font-family: inherit; cursor: pointer; transition: transform .15s, filter .15s;
-  }
+  .btn { border: none; border-radius: 999px; padding: 11px 20px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: transform .15s, filter .15s; }
   .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
   .btn:active { transform: translateY(0); }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-wheel { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #fff; }
 
-  .controls {
-    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-    background: color-mix(in srgb, var(--bg) 86%, transparent);
-    backdrop-filter: blur(10px);
-    padding-block: 12px;
-    border-bottom: 1px solid var(--line);
-    margin: 22px 0;
-  }
-  .search {
-    width: 100%; border: 1px solid var(--line); background: var(--surface);
-    color: var(--fg); border-radius: 999px; padding: 12px 18px; font-size: 15px;
-    font-family: inherit; margin-bottom: 10px;
-  }
+  .sync { margin-top: 14px; display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted);
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 13px; }
+  .sync .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .sync.synced .dot { background: var(--green); }
+  .sync.synced { color: var(--green); }
+  .sync.readonly .dot { background: var(--amber); }
+
+  .controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(10px); padding-block: 12px; border-bottom: 1px solid var(--line); margin: 22px 0; }
+  .search { width: 100%; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 12px 18px; font-size: 15px; font-family: inherit; margin-bottom: 10px; }
   .search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-  .chip {
-    border: 1px solid var(--line); background: var(--surface); color: var(--muted);
-    border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 500;
-    cursor: pointer; font-family: inherit; transition: all .15s;
-  }
+  .chip { border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .15s; }
   .chip[aria-pressed="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
   .chip.fav[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); }
   .chip.tried[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
 
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding-bottom: 60px; }
   @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
-
-  .card {
-    position: relative; text-align: left; cursor: pointer;
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: var(--radius); padding: 18px; font-family: inherit;
-    color: var(--fg); transition: transform .15s, box-shadow .15s, border-color .15s;
-    display: flex; flex-direction: column; gap: 10px; min-width: 0;
-  }
+  .card { position: relative; text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; font-family: inherit; color: var(--fg); transition: transform .15s, box-shadow .15s, border-color .15s; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--accent); }
   .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .card h3 { font-size: 19px; }
   .card .tag { font-size: 12px; color: var(--muted); }
   .card .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .heart {
-    position: absolute; top: 12px; right: 12px; border: none; background: none;
-    font-size: 20px; cursor: pointer; line-height: 1; padding: 4px;
-    color: var(--line); transition: transform .15s, color .15s;
-  }
+  .heart { position: absolute; top: 12px; right: 12px; border: none; background: none; font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; color: var(--line); transition: transform .15s, color .15s; }
   .heart[aria-pressed="true"] { color: var(--accent); }
   .heart:hover { transform: scale(1.2); }
-
-  .level { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-    padding: 3px 9px; border-radius: 999px; }
+  .level { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; }
   .level.easy { background: color-mix(in srgb, var(--green) 18%, transparent); color: var(--green); }
   .level.medium { background: color-mix(in srgb, var(--amber) 20%, transparent); color: var(--amber); }
   .level.adventurous { background: color-mix(in srgb, var(--red) 18%, transparent); color: var(--red); }
-
   .blurb { font-size: 14px; color: var(--muted); }
   .empty { grid-column: 1/-1; text-align: center; color: var(--muted); padding: 50px 20px; }
-
-  /* Detail sheet + wheel share the scrim */
-  .scrim {
-    position: fixed; inset: 0; background: rgba(30,10,18,.6); backdrop-filter: blur(4px);
-    z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s;
-  }
-  .scrim.open { opacity: 1; pointer-events: auto; }
-  .sheet {
-    position: fixed; z-index: 50; left: 50%; top: 50%;
-    transform: translate(-50%, -46%) scale(.98); opacity: 0; pointer-events: none;
-    width: min(620px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
-    box-shadow: var(--shadow); padding: 26px; transition: opacity .25s, transform .25s;
-  }
-  .sheet.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
-  .sheet .close {
-    position: absolute; top: 16px; right: 16px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px;
-    font-size: 18px; cursor: pointer; line-height: 1;
-  }
-  .sheet h2 { font-size: 30px; margin-bottom: 6px; padding-right: 40px; }
-  .sheet .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
-  .sheet section { margin-top: 20px; }
-  .sheet section h4 {
-    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
-    margin: 0 0 8px; font-weight: 700;
-  }
-  .steps { margin: 0; padding-left: 0; list-style: none; counter-reset: step; display: grid; gap: 10px; }
-  .steps li { position: relative; padding-left: 38px; counter-increment: step; }
-  .steps li::before {
-    content: counter(step); position: absolute; left: 0; top: -1px;
-    width: 26px; height: 26px; border-radius: 999px; background: var(--accent-soft);
-    color: var(--accent); font-weight: 700; font-size: 13px;
-    display: grid; place-items: center; font-family: var(--font-body);
-  }
-  .tips { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
-  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .pill { font-size: 12px; background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 4px 11px; }
-
-  /* Tracker: tried toggle, rating, notes */
-  .tracker { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 22px; }
-  .tried-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .toggle {
-    border: 1px solid var(--line); background: var(--surface); color: var(--fg);
-    border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
-    transition: all .15s;
-  }
-  .toggle[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
-  .stars { display: inline-flex; gap: 2px; }
-  .stars button {
-    border: none; background: none; cursor: pointer; font-size: 24px; line-height: 1; padding: 2px;
-    color: var(--line); transition: color .12s, transform .12s;
-  }
-  .stars button.on { color: var(--gold); }
-  .stars button:hover { transform: scale(1.15); }
-  .note {
-    width: 100%; margin-top: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
-    border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 14px; resize: vertical; min-height: 64px;
-  }
-  .note:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .note-saved { font-size: 12px; color: var(--green); margin-top: 6px; height: 14px; }
   .card-badges { position: absolute; bottom: 14px; right: 14px; display: flex; gap: 5px; font-size: 13px; }
   .card-badges .b { color: var(--green); }
   .card-badges .b.rate { color: var(--gold); }
 
-  /* Wheel */
-  .wheelbox {
-    position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(.96);
-    opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
-    width: min(560px, calc(100vw - 32px)); background: var(--surface);
-    border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow);
-    padding: 24px; text-align: center;
-  }
+  .scrim { position: fixed; inset: 0; background: rgba(30,10,18,.6); backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -46%) scale(.98); opacity: 0; pointer-events: none; width: min(620px, calc(100vw - 32px)); max-height: 86vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow); padding: 26px; transition: opacity .25s, transform .25s; }
+  .sheet.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+  .sheet .close { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px; font-size: 18px; cursor: pointer; line-height: 1; }
+  .sheet h2 { font-size: 30px; margin-bottom: 6px; padding-right: 40px; }
+  .sheet .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+  .sheet section { margin-top: 20px; }
+  .sheet section h4 { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; font-weight: 700; }
+  .steps { margin: 0; padding-left: 0; list-style: none; counter-reset: step; display: grid; gap: 10px; }
+  .steps li { position: relative; padding-left: 38px; counter-increment: step; }
+  .steps li::before { content: counter(step); position: absolute; left: 0; top: -1px; width: 26px; height: 26px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 13px; display: grid; place-items: center; font-family: var(--font-body); }
+  .tips { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill { font-size: 12px; background: var(--surface-2); color: var(--muted); border-radius: 999px; padding: 4px 11px; }
+
+  .tracker { background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-top: 22px; }
+  .tried-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .toggle { border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .toggle[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+  .stars { display: inline-flex; gap: 2px; }
+  .stars button { border: none; background: none; cursor: pointer; font-size: 24px; line-height: 1; padding: 2px; color: var(--line); transition: color .12s, transform .12s; }
+  .stars button.on { color: var(--gold); }
+  .stars button:hover { transform: scale(1.15); }
+  .note { width: 100%; margin-top: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 14px; resize: vertical; min-height: 64px; }
+  .note:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .note[disabled] { opacity: .7; cursor: not-allowed; }
+  .note-saved { font-size: 12px; color: var(--green); margin-top: 6px; min-height: 16px; }
+
+  .wheelbox { position: fixed; z-index: 50; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(.96); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; width: min(560px, calc(100vw - 32px)); background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow); padding: 24px; text-align: center; }
   .wheelbox.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%) scale(1); }
-  .wheelbox .close {
-    position: absolute; top: 16px; right: 16px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px;
-    font-size: 18px; cursor: pointer; line-height: 1;
-  }
+  .wheelbox .close { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); width: 34px; height: 34px; border-radius: 999px; font-size: 18px; cursor: pointer; line-height: 1; }
   .wheelbox h2 { font-size: 26px; margin-bottom: 4px; }
   .wheelbox p.hint { color: var(--muted); font-size: 14px; margin: 4px 0 18px; }
   .wheel-wrap { position: relative; width: min(300px, 72vw); aspect-ratio: 1; margin: 0 auto 18px; }
-  .wheel-wrap::after {
-    content: ""; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
-    border-left: 12px solid transparent; border-right: 12px solid transparent;
-    border-top: 20px solid var(--accent); z-index: 3; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3));
-  }
-  #wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 4.5s cubic-bezier(.17,.67,.12,.99);
-    box-shadow: var(--shadow); }
+  .wheel-wrap::after { content: ""; position: absolute; top: -4px; left: 50%; transform: translateX(-50%); border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid var(--accent); z-index: 3; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+  #wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 4.5s cubic-bezier(.17,.67,.12,.99); box-shadow: var(--shadow); }
   .wheel-result { min-height: 46px; margin-bottom: 14px; }
   .wheel-result strong { font-family: var(--font-display); font-size: 22px; color: var(--accent); }
   .wheel-result span { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
   .wheel-filters { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
 
   footer { text-align: center; color: var(--muted); font-size: 12px; padding: 30px 20px 40px; }
-  .theme-toggle {
-    position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px; z-index: 30;
-    border: 1px solid var(--line); background: var(--surface); color: var(--fg);
-    border-radius: 999px; width: 44px; height: 44px; font-size: 18px; cursor: pointer; box-shadow: var(--shadow);
-  }
+  .theme-toggle { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px; z-index: 30; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; width: 44px; height: 44px; font-size: 18px; cursor: pointer; box-shadow: var(--shadow); }
 </style>
 </head>
 <body>
@@ -273,6 +163,7 @@
     <button class="btn btn-primary" id="surprise">✦ Surprise Us</button>
     <button class="btn btn-wheel" id="openWheel">🎡 Date-Night Wheel</button>
   </div>
+  <div><span class="sync" id="sync"><span class="dot"></span><span id="syncLabel">Saved on this device</span></span></div>
 </header>
 
 <div class="controls">
@@ -289,9 +180,7 @@
   </div>
 </div>
 
-<main class="wrap">
-  <div class="grid" id="grid"></div>
-</main>
+<main class="wrap"><div class="grid" id="grid"></div></main>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"></div>
@@ -314,292 +203,90 @@
 
 <button class="theme-toggle" id="theme" aria-label="Toggle light and dark">☾</button>
 
-<footer class="wrap">
-  Made for two. Everything saved stays on this device only. Consent, comfort, and communication come first.
-</footer>
+<footer class="wrap">Made for two. Your shared log syncs between partners when you open this in Claude; opened anywhere else, it saves on that device. Consent, comfort, and communication come first.</footer>
 
 <script>
 const POSITIONS = [
-  {
-    id: "spooning", name: "Spooning", level: "easy", intimacy: "High",
-    tags: ["Lazy", "Cozy", "Face-to-back"],
-    blurb: "Curled up on your sides, one of you tucked warmly into the other. Barely-have-to-move closeness.",
-    steps: [
-      "Both lie on your sides facing the same way, the one behind pressed gently against the other's back.",
-      "The partner behind slides an arm under or over, hips settling together until it feels right.",
-      "Rock into a slow, shared rhythm — this one rewards patience, not hurry.",
-    ],
-    tips: [
-      "A pillow under the front partner's top knee opens the angle and takes away any strain.",
-      "Perfect for sleepy mornings. Whoever's behind has a free hand — use it to tease, stroke, and keep them wanting more.",
-    ],
-  },
-  {
-    id: "missionary", name: "Classic", level: "easy", intimacy: "High",
-    tags: ["Face-to-face", "Eye contact", "Kissing"],
-    blurb: "One of you on your back, the other close above. The one everyone knows — and it's a classic for a reason.",
-    steps: [
-      "One partner lies back, relaxed, knees softly bent and inviting.",
-      "The other settles in close, weight on forearms so you can stay chest-to-chest.",
-      "Keep your faces near for kissing and eye contact; shift the lower partner's legs higher to change everything.",
-    ],
-    tips: [
-      "Slide a pillow under the lower partner's hips — that small lift changes the angle more than you'd expect.",
-      "Hook their legs up over your shoulders or wrap them around your waist to go deeper and closer. Ask what feels best and chase it.",
-    ],
-  },
-  {
-    id: "cowgirl", name: "On Top", level: "easy", intimacy: "High",
-    tags: ["Partner-led", "Control", "Face-to-face"],
-    blurb: "One of you lies back and simply enjoys the view while the other climbs on and runs the show.",
-    steps: [
-      "One partner lies back, hands free to roam.",
-      "The other straddles them, kneeling or squatting, and sinks down at their own pace.",
-      "The one on top owns the rhythm — grinding slow, riding fast, leaning in or arching back.",
-    ],
-    tips: [
-      "Leaning forward onto their chest turns up the intimacy and the kissing; leaning back changes the angle entirely.",
-      "The partner underneath can grip their hips, guide the pace, and reach up to tease. Nobody's just lying there.",
-    ],
-  },
-  {
-    id: "seated-embrace", name: "Seated Embrace", level: "medium", intimacy: "Very high",
-    tags: ["Face-to-face", "Wrapped", "Slow"],
-    blurb: "One sits, the other settles into their lap, and you wrap all the way around each other.",
-    steps: [
-      "One partner sits on the bed's edge or a sturdy chair, feet planted.",
-      "The other lowers into their lap, facing them, legs wrapped around their back.",
-      "Hold tight and rock together in small, slow motions instead of thrusting.",
-    ],
-    tips: [
-      "The edge of the bed gives the seated partner real leverage to move with you.",
-      "This one's all about the closeness — foreheads touching, breathing together, eyes open.",
-    ],
-  },
-  {
-    id: "from-behind", name: "From Behind", level: "medium", intimacy: "Medium",
-    tags: ["Rear", "Deeper", "Primal"],
-    blurb: "One on hands and knees, the other kneeling behind. Deep, intense, and a little bit greedy.",
-    steps: [
-      "One partner settles onto hands and knees, steady and comfortable.",
-      "The other kneels behind, hands resting on their hips, and eases in slowly.",
-      "Start shallow and build; let the one in front push back to set the depth they want.",
-    ],
-    tips: [
-      "Dropping onto the forearms, or a pillow under the chest, deepens the angle and relaxes the back.",
-      "A hand reaching around the front — or gathering a handful of hair, if that's your thing — keeps the partner in front right on the edge.",
-    ],
-  },
-  {
-    id: "side-by-side", name: "Side by Side", level: "medium", intimacy: "High",
-    tags: ["Face-to-face", "Relaxed", "Leg-hook"],
-    blurb: "Both on your sides, face to face, legs woven together. Tangled-up and unhurried.",
-    steps: [
-      "Lie facing each other, close enough that your lips are already touching.",
-      "One partner drapes their top leg over the other's hip to open things up.",
-      "Move together gently — this is a slow burn, not a sprint.",
-    ],
-    tips: [
-      "It takes a little shuffling to line up — laugh through it, that's part of the fun.",
-      "Low effort for both bodies, so you can stay wrapped up in it for a long, long time.",
-    ],
-  },
-  {
-    id: "edge-of-bed", name: "Edge of the Bed", level: "medium", intimacy: "Medium",
-    tags: ["Leverage", "Angle", "Standing-ish"],
-    blurb: "One lies back at the bed's edge, the other stands or kneels at the side. Great leverage, great angle.",
-    steps: [
-      "One partner lies back with hips right at the very edge of the mattress.",
-      "The other stands or kneels at the edge, lined up at matching height.",
-      "The bed height sets the angle — stack pillows under the hips to dial it in perfectly.",
-    ],
-    tips: [
-      "Ideal when your heights don't naturally match up standing.",
-      "The standing partner's hands are free to hold their legs wide, grip their hips, or wander.",
-    ],
-  },
-  {
-    id: "lap-facing-away", name: "Reverse Lap", level: "medium", intimacy: "Medium",
-    tags: ["Partner-led", "Rear-facing", "Seated"],
-    blurb: "One sits, the other settles into their lap facing away and rolls their hips. A serious view.",
-    steps: [
-      "One partner sits on a sturdy surface, feet flat and planted.",
-      "The other sits back into their lap, facing away, using feet or knees for balance.",
-      "The partner underneath supports and thrusts up while the other grinds down to meet them.",
-    ],
-    tips: [
-      "Put a mirror in front and 'facing away' suddenly becomes all the eye contact you want.",
-      "Lean all the way back against their chest for a slower, closer, wrapped-up version.",
-    ],
-  },
-  {
-    id: "legs-up", name: "Legs Up", level: "adventurous", intimacy: "Medium",
-    tags: ["Deeper", "Flexible", "Intense"],
-    blurb: "The classic, turned up: legs raised high for a deeper, more intense angle.",
-    steps: [
-      "One partner lies back and lifts their legs toward their chest, or up onto the other's shoulders.",
-      "The other kneels or leans in close above them.",
-      "Go slow — this angle feels far more intense, so stay checked in and read each other.",
-    ],
-    tips: [
-      "Only go as far as the body happily allows; there's no prize for pushing past comfortable.",
-      "A pillow under the lower back supports the lift and lets you both relax into it.",
-    ],
-  },
-  {
-    id: "standing", name: "Standing Hold", level: "adventurous", intimacy: "Medium",
-    tags: ["Upright", "Strength", "Spontaneous"],
-    blurb: "Both on your feet — or one lifted and wrapped around the other. Spontaneous, physical, a little reckless.",
-    steps: [
-      "Stand close, ideally with one partner braced against a wall for stability.",
-      "If you're lifting, the lifted partner wraps legs around and holds on tight; the other takes the weight from below.",
-      "Keep it playful and short, or let the wall do the heavy lifting so you can last.",
-    ],
-    tips: [
-      "Lifting burns out fast — a wall, counter, or a stair step takes most of the strain off.",
-      "Honestly? It's often easiest to start standing, get carried away, then tumble onto the bed. No shame in the landing.",
-    ],
-  },
-  {
-    id: "bridge", name: "The Arch", level: "adventurous", intimacy: "Low",
-    tags: ["Athletic", "Angle", "Show-off"],
-    blurb: "The receiving partner lifts into a bridge for a dramatic, show-off angle. Brief and thrilling.",
-    steps: [
-      "One partner lies back and presses their hips up into a supported bridge, feet flat.",
-      "The other kneels close to meet those raised hips.",
-      "It's demanding to hold, so keep it short and drop down whenever you like.",
-    ],
-    tips: [
-      "Stack firm pillows under the hips to hold the arch without turning it into a workout.",
-      "Very much a 'try it for a minute, grin at each other, move on' kind of position.",
-    ],
-  },
-  {
-    id: "lotus", name: "Lotus", level: "adventurous", intimacy: "Very high",
-    tags: ["Wrapped", "Slow", "Tantric"],
-    blurb: "A cross-legged seated embrace, completely wrapped around each other. Built for slow, eyes-open connection.",
-    steps: [
-      "One partner sits cross-legged on a firm surface.",
-      "The other sits into their lap, facing them, wrapping both legs around their back.",
-      "Wind your arms around each other and move in tiny, slow rolls — almost more swaying than thrusting.",
-    ],
-    tips: [
-      "Sync your breathing; this one lives somewhere between sex and meditation.",
-      "A firm cushion under the base partner saves the knees and lets you stay in it longer.",
-    ],
-  },
-  {
-    id: "pretzel", name: "The Twist", level: "adventurous", intimacy: "Medium",
-    tags: ["Deeper", "Side-lying", "Inventive"],
-    blurb: "A half-side-lying tangle that keeps you face to face while reaching surprisingly deep.",
-    steps: [
-      "One partner lies on their side; the other kneels, straddling that bottom leg.",
-      "The side-lying partner drapes their top leg over the kneeling partner's hip.",
-      "The kneeling partner leans in — you stay connected and can still see each other's faces.",
-    ],
-    tips: [
-      "Takes a moment to assemble — go slow and adjust until both of you are comfortable.",
-      "The kneeling partner has a free hand the whole time. Put it to good use.",
-    ],
-  },
-  {
-    id: "chair", name: "The Chair", level: "medium", intimacy: "High",
-    tags: ["Seated", "Furniture", "Grind"],
-    blurb: "One sits in a sturdy chair, the other climbs into their lap. Change of scenery, change of pace.",
-    steps: [
-      "One partner sits in a solid, armless chair, feet flat on the floor.",
-      "The other straddles their lap, facing them, arms around their neck.",
-      "Grind and rock together; the one in the chair can thrust up to meet them.",
-    ],
-    tips: [
-      "Face away instead for a different angle and a view in the nearest mirror.",
-      "Make sure the chair's up to it — this is not the moment to trust a wobbly dining stool.",
-    ],
-  },
-  {
-    id: "doggy-flat", name: "Lying Flat", level: "medium", intimacy: "Medium",
-    tags: ["Rear", "Lazy", "Full-contact"],
-    blurb: "Like from-behind, but lying all the way down. Full-body contact, barely any effort.",
-    steps: [
-      "One partner lies flat on their front, hips lifted just slightly, maybe a pillow underneath.",
-      "The other lies over their back, matching the length of their body.",
-      "Move in slow, grinding motions — there's full skin contact head to toe.",
-    ],
-    tips: [
-      "Squeezing the legs together changes the sensation for both of you.",
-      "Whisper in their ear while you move. The closeness makes it electric.",
-    ],
-  },
-  {
-    id: "face-sitting", name: "Throne", level: "adventurous", intimacy: "High",
-    tags: ["Oral", "Partner-led", "Giving"],
-    blurb: "One lies back; the other kneels above their face. All about giving generously.",
-    steps: [
-      "One partner lies comfortably on their back, head well supported by a pillow.",
-      "The other kneels over them, lowering down only as far as feels good for both.",
-      "The one on top controls the pressure and pace; the one below uses hands, lips, and tongue.",
-    ],
-    tips: [
-      "Agree on a tap or a word beforehand so the partner below can signal easily.",
-      "The one above can hold the headboard or wall for balance and leverage.",
-    ],
-  },
-  {
-    id: "69", name: "Mutual", level: "medium", intimacy: "High",
-    tags: ["Oral", "Simultaneous", "Playful"],
-    blurb: "Both giving at once, bodies reversed. Equal parts generous and distracting.",
-    steps: [
-      "One partner lies on their back; the other lies over them, facing the opposite direction.",
-      "Line up so each of you can reach the other comfortably with your mouth.",
-      "Give and receive at the same time — or take turns teasing when the distraction gets delicious.",
-    ],
-    tips: [
-      "Side-by-side is comfier than top-and-bottom for a lot of couples. Try it.",
-      "It's fine to slow your own giving when theirs makes it impossible to focus. That's the whole charm.",
-    ],
-  },
-  {
-    id: "edge-kneel", name: "Kneeling Worship", level: "easy", intimacy: "High",
-    tags: ["Oral", "Giving", "Edge-of-bed"],
-    blurb: "One sits at the bed's edge, the other kneels to give. Simple, worshipful, intense.",
-    steps: [
-      "One partner sits at the edge of the bed, leaning back on their hands, legs open.",
-      "The other kneels on the floor between their knees.",
-      "Take your time with hands and mouth; watch their reactions and follow them.",
-    ],
-    tips: [
-      "A cushion under the knees makes the giver far more comfortable for the long haul.",
-      "Let the seated partner guide with a hand — direction is part of the fun.",
-    ],
-  },
-  {
-    id: "scissor", name: "Scissors", level: "medium", intimacy: "Medium",
-    tags: ["Grinding", "Legs-woven", "Clothed-friendly"],
-    blurb: "Legs interlocked like scissors, grinding close. Works with or without clothes on.",
-    steps: [
-      "Both partners lie back and bring your bodies together, legs crossing over each other's.",
-      "Interlock so you're pressed together where it counts.",
-      "Grind in a slow, building rhythm, adjusting the angle until it's just right.",
-    ],
-    tips: [
-      "A pillow under one partner's hips helps you line up and press closer.",
-      "Great as a long, teasing warm-up before anything else — or as the whole night.",
-    ],
-  },
-  {
-    id: "wall-pin", name: "Against the Wall", level: "adventurous", intimacy: "Medium",
-    tags: ["Upright", "Urgent", "Spontaneous"],
-    blurb: "One pinned to the wall, the other pressed close. For when you can't make it to the bed.",
-    steps: [
-      "One partner stands with their back (or front) to a solid wall for support.",
-      "The other presses in close, using the wall to take the weight and the strain.",
-      "Keep it urgent and short, then move somewhere you can really sink in.",
-    ],
-    tips: [
-      "The wall is doing you a favor — lean into it so nobody's straining to stay upright.",
-      "A great opener that turns into being carried to the bed. Start here, finish there.",
-    ],
-  },
+  { id:"spooning", name:"Spooning", level:"easy", intimacy:"High", tags:["Lazy","Cozy","Face-to-back"],
+    blurb:"Curled up on your sides, one of you tucked warmly into the other. Barely-have-to-move closeness.",
+    steps:["Both lie on your sides facing the same way, the one behind pressed gently against the other's back.","The partner behind slides an arm under or over, hips settling together until it feels right.","Rock into a slow, shared rhythm — this one rewards patience, not hurry."],
+    tips:["A pillow under the front partner's top knee opens the angle and takes away any strain.","Perfect for sleepy mornings. Whoever's behind has a free hand — use it to tease, stroke, and keep them wanting more."] },
+  { id:"missionary", name:"Classic", level:"easy", intimacy:"High", tags:["Face-to-face","Eye contact","Kissing"],
+    blurb:"One of you on your back, the other close above. The one everyone knows — and it's a classic for a reason.",
+    steps:["One partner lies back, relaxed, knees softly bent and inviting.","The other settles in close, weight on forearms so you can stay chest-to-chest.","Keep your faces near for kissing and eye contact; shift the lower partner's legs higher to change everything."],
+    tips:["Slide a pillow under the lower partner's hips — that small lift changes the angle more than you'd expect.","Hook their legs up over your shoulders or wrap them around your waist to go deeper and closer. Ask what feels best and chase it."] },
+  { id:"cowgirl", name:"On Top", level:"easy", intimacy:"High", tags:["Partner-led","Control","Face-to-face"],
+    blurb:"One of you lies back and simply enjoys the view while the other climbs on and runs the show.",
+    steps:["One partner lies back, hands free to roam.","The other straddles them, kneeling or squatting, and sinks down at their own pace.","The one on top owns the rhythm — grinding slow, riding fast, leaning in or arching back."],
+    tips:["Leaning forward onto their chest turns up the intimacy and the kissing; leaning back changes the angle entirely.","The partner underneath can grip their hips, guide the pace, and reach up to tease. Nobody's just lying there."] },
+  { id:"seated-embrace", name:"Seated Embrace", level:"medium", intimacy:"Very high", tags:["Face-to-face","Wrapped","Slow"],
+    blurb:"One sits, the other settles into their lap, and you wrap all the way around each other.",
+    steps:["One partner sits on the bed's edge or a sturdy chair, feet planted.","The other lowers into their lap, facing them, legs wrapped around their back.","Hold tight and rock together in small, slow motions instead of thrusting."],
+    tips:["The edge of the bed gives the seated partner real leverage to move with you.","This one's all about the closeness — foreheads touching, breathing together, eyes open."] },
+  { id:"from-behind", name:"From Behind", level:"medium", intimacy:"Medium", tags:["Rear","Deeper","Primal"],
+    blurb:"One on hands and knees, the other kneeling behind. Deep, intense, and a little bit greedy.",
+    steps:["One partner settles onto hands and knees, steady and comfortable.","The other kneels behind, hands resting on their hips, and eases in slowly.","Start shallow and build; let the one in front push back to set the depth they want."],
+    tips:["Dropping onto the forearms, or a pillow under the chest, deepens the angle and relaxes the back.","A hand reaching around the front — or gathering a handful of hair, if that's your thing — keeps the partner in front right on the edge."] },
+  { id:"side-by-side", name:"Side by Side", level:"medium", intimacy:"High", tags:["Face-to-face","Relaxed","Leg-hook"],
+    blurb:"Both on your sides, face to face, legs woven together. Tangled-up and unhurried.",
+    steps:["Lie facing each other, close enough that your lips are already touching.","One partner drapes their top leg over the other's hip to open things up.","Move together gently — this is a slow burn, not a sprint."],
+    tips:["It takes a little shuffling to line up — laugh through it, that's part of the fun.","Low effort for both bodies, so you can stay wrapped up in it for a long, long time."] },
+  { id:"edge-of-bed", name:"Edge of the Bed", level:"medium", intimacy:"Medium", tags:["Leverage","Angle","Standing-ish"],
+    blurb:"One lies back at the bed's edge, the other stands or kneels at the side. Great leverage, great angle.",
+    steps:["One partner lies back with hips right at the very edge of the mattress.","The other stands or kneels at the edge, lined up at matching height.","The bed height sets the angle — stack pillows under the hips to dial it in perfectly."],
+    tips:["Ideal when your heights don't naturally match up standing.","The standing partner's hands are free to hold their legs wide, grip their hips, or wander."] },
+  { id:"lap-facing-away", name:"Reverse Lap", level:"medium", intimacy:"Medium", tags:["Partner-led","Rear-facing","Seated"],
+    blurb:"One sits, the other settles into their lap facing away and rolls their hips. A serious view.",
+    steps:["One partner sits on a sturdy surface, feet flat and planted.","The other sits back into their lap, facing away, using feet or knees for balance.","The partner underneath supports and thrusts up while the other grinds down to meet them."],
+    tips:["Put a mirror in front and 'facing away' suddenly becomes all the eye contact you want.","Lean all the way back against their chest for a slower, closer, wrapped-up version."] },
+  { id:"legs-up", name:"Legs Up", level:"adventurous", intimacy:"Medium", tags:["Deeper","Flexible","Intense"],
+    blurb:"The classic, turned up: legs raised high for a deeper, more intense angle.",
+    steps:["One partner lies back and lifts their legs toward their chest, or up onto the other's shoulders.","The other kneels or leans in close above them.","Go slow — this angle feels far more intense, so stay checked in and read each other."],
+    tips:["Only go as far as the body happily allows; there's no prize for pushing past comfortable.","A pillow under the lower back supports the lift and lets you both relax into it."] },
+  { id:"standing", name:"Standing Hold", level:"adventurous", intimacy:"Medium", tags:["Upright","Strength","Spontaneous"],
+    blurb:"Both on your feet — or one lifted and wrapped around the other. Spontaneous, physical, a little reckless.",
+    steps:["Stand close, ideally with one partner braced against a wall for stability.","If you're lifting, the lifted partner wraps legs around and holds on tight; the other takes the weight from below.","Keep it playful and short, or let the wall do the heavy lifting so you can last."],
+    tips:["Lifting burns out fast — a wall, counter, or a stair step takes most of the strain off.","Honestly? It's often easiest to start standing, get carried away, then tumble onto the bed. No shame in the landing."] },
+  { id:"bridge", name:"The Arch", level:"adventurous", intimacy:"Low", tags:["Athletic","Angle","Show-off"],
+    blurb:"The receiving partner lifts into a bridge for a dramatic, show-off angle. Brief and thrilling.",
+    steps:["One partner lies back and presses their hips up into a supported bridge, feet flat.","The other kneels close to meet those raised hips.","It's demanding to hold, so keep it short and drop down whenever you like."],
+    tips:["Stack firm pillows under the hips to hold the arch without turning it into a workout.","Very much a 'try it for a minute, grin at each other, move on' kind of position."] },
+  { id:"lotus", name:"Lotus", level:"adventurous", intimacy:"Very high", tags:["Wrapped","Slow","Tantric"],
+    blurb:"A cross-legged seated embrace, completely wrapped around each other. Built for slow, eyes-open connection.",
+    steps:["One partner sits cross-legged on a firm surface.","The other sits into their lap, facing them, wrapping both legs around their back.","Wind your arms around each other and move in tiny, slow rolls — almost more swaying than thrusting."],
+    tips:["Sync your breathing; this one lives somewhere between sex and meditation.","A firm cushion under the base partner saves the knees and lets you stay in it longer."] },
+  { id:"pretzel", name:"The Twist", level:"adventurous", intimacy:"Medium", tags:["Deeper","Side-lying","Inventive"],
+    blurb:"A half-side-lying tangle that keeps you face to face while reaching surprisingly deep.",
+    steps:["One partner lies on their side; the other kneels, straddling that bottom leg.","The side-lying partner drapes their top leg over the kneeling partner's hip.","The kneeling partner leans in — you stay connected and can still see each other's faces."],
+    tips:["Takes a moment to assemble — go slow and adjust until both of you are comfortable.","The kneeling partner has a free hand the whole time. Put it to good use."] },
+  { id:"chair", name:"The Chair", level:"medium", intimacy:"High", tags:["Seated","Furniture","Grind"],
+    blurb:"One sits in a sturdy chair, the other climbs into their lap. Change of scenery, change of pace.",
+    steps:["One partner sits in a solid, armless chair, feet flat on the floor.","The other straddles their lap, facing them, arms around their neck.","Grind and rock together; the one in the chair can thrust up to meet them."],
+    tips:["Face away instead for a different angle and a view in the nearest mirror.","Make sure the chair's up to it — this is not the moment to trust a wobbly dining stool."] },
+  { id:"doggy-flat", name:"Lying Flat", level:"medium", intimacy:"Medium", tags:["Rear","Lazy","Full-contact"],
+    blurb:"Like from-behind, but lying all the way down. Full-body contact, barely any effort.",
+    steps:["One partner lies flat on their front, hips lifted just slightly, maybe a pillow underneath.","The other lies over their back, matching the length of their body.","Move in slow, grinding motions — there's full skin contact head to toe."],
+    tips:["Squeezing the legs together changes the sensation for both of you.","Whisper in their ear while you move. The closeness makes it electric."] },
+  { id:"face-sitting", name:"Throne", level:"adventurous", intimacy:"High", tags:["Oral","Partner-led","Giving"],
+    blurb:"One lies back; the other kneels above their face. All about giving generously.",
+    steps:["One partner lies comfortably on their back, head well supported by a pillow.","The other kneels over them, lowering down only as far as feels good for both.","The one on top controls the pressure and pace; the one below uses hands, lips, and tongue."],
+    tips:["Agree on a tap or a word beforehand so the partner below can signal easily.","The one above can hold the headboard or wall for balance and leverage."] },
+  { id:"sixtynine", name:"Mutual", level:"medium", intimacy:"High", tags:["Oral","Simultaneous","Playful"],
+    blurb:"Both giving at once, bodies reversed. Equal parts generous and distracting.",
+    steps:["One partner lies on their back; the other lies over them, facing the opposite direction.","Line up so each of you can reach the other comfortably with your mouth.","Give and receive at the same time — or take turns teasing when the distraction gets delicious."],
+    tips:["Side-by-side is comfier than top-and-bottom for a lot of couples. Try it.","It's fine to slow your own giving when theirs makes it impossible to focus. That's the whole charm."] },
+  { id:"edge-kneel", name:"Kneeling Worship", level:"easy", intimacy:"High", tags:["Oral","Giving","Edge-of-bed"],
+    blurb:"One sits at the bed's edge, the other kneels to give. Simple, worshipful, intense.",
+    steps:["One partner sits at the edge of the bed, leaning back on their hands, legs open.","The other kneels on the floor between their knees.","Take your time with hands and mouth; watch their reactions and follow them."],
+    tips:["A cushion under the knees makes the giver far more comfortable for the long haul.","Let the seated partner guide with a hand — direction is part of the fun."] },
+  { id:"scissor", name:"Scissors", level:"medium", intimacy:"Medium", tags:["Grinding","Legs-woven","Clothed-friendly"],
+    blurb:"Legs interlocked like scissors, grinding close. Works with or without clothes on.",
+    steps:["Both partners lie back and bring your bodies together, legs crossing over each other's.","Interlock so you're pressed together where it counts.","Grind in a slow, building rhythm, adjusting the angle until it's just right."],
+    tips:["A pillow under one partner's hips helps you line up and press closer.","Great as a long, teasing warm-up before anything else — or as the whole night."] },
+  { id:"wall-pin", name:"Against the Wall", level:"adventurous", intimacy:"Medium", tags:["Upright","Urgent","Spontaneous"],
+    blurb:"One pinned to the wall, the other pressed close. For when you can't make it to the bed.",
+    steps:["One partner stands with their back (or front) to a solid wall for support.","The other presses in close, using the wall to take the weight and the strain.","Keep it urgent and short, then move somewhere you can really sink in."],
+    tips:["The wall is doing you a favor — lean into it so nobody's straining to stay upright.","A great opener that turns into being carried to the bed. Start here, finish there."] },
 ];
 
 const grid = document.getElementById("grid");
@@ -610,27 +297,88 @@ const chips = document.getElementById("chips");
 
 let activeFilter = "all";
 let query = "";
+let currentId = null; // open position in the sheet
 
-let favs = new Set();
-try { favs = new Set(JSON.parse(localStorage.getItem("closer-favs") || "[]")); } catch (e) {}
-function saveFavs() { try { localStorage.setItem("closer-favs", JSON.stringify([...favs])); } catch (e) {} }
+/* ---------- Shared / local log ----------
+   LOG[id] = { fav, tried, rating, note }. Lives in the db capability when
+   running in Claude (syncs between partners); mirrored to localStorage, which
+   is the sole store anywhere window.claude is absent (e.g. a static host). */
+const LOG = {};
+let db = null;
+let canWrite = true;
+const inflight = {}, dirty = {};
 
-// Tracker state: tried (Set of ids), ratings {id: 1-5}, notes {id: string}
-let tried = new Set();
-let ratings = {};
-let notes = {};
-try { tried = new Set(JSON.parse(localStorage.getItem("closer-tried") || "[]")); } catch (e) {}
-try { ratings = JSON.parse(localStorage.getItem("closer-ratings") || "{}"); } catch (e) {}
-try { notes = JSON.parse(localStorage.getItem("closer-notes") || "{}"); } catch (e) {}
-function saveTried() { try { localStorage.setItem("closer-tried", JSON.stringify([...tried])); } catch (e) {} }
-function saveRatings() { try { localStorage.setItem("closer-ratings", JSON.stringify(ratings)); } catch (e) {} }
-function saveNotes() { try { localStorage.setItem("closer-notes", JSON.stringify(notes)); } catch (e) {} }
+function entry(id) { return LOG[id] || (LOG[id] = {}); }
+const isFav = id => !!(LOG[id] && LOG[id].fav);
+const isTried = id => !!(LOG[id] && LOG[id].tried);
+const ratingOf = id => (LOG[id] && LOG[id].rating) || 0;
+const noteOf = id => (LOG[id] && LOG[id].note) || "";
+
+function loadLocal() { try { Object.assign(LOG, JSON.parse(localStorage.getItem("closer-log") || "{}")); } catch (e) {} }
+function saveLocal() { try { localStorage.setItem("closer-log", JSON.stringify(LOG)); } catch (e) {} }
+
+function cleanEntry(id) {
+  const e = LOG[id] || {};
+  const out = {};
+  if (e.fav) out.fav = true;
+  if (e.tried) out.tried = true;
+  if (e.rating) out.rating = e.rating;
+  if (e.note) out.note = e.note;
+  return out;
+}
+
+// Persist one position's entry: localStorage always, db when available.
+async function persist(id) {
+  saveLocal();
+  if (!db || !canWrite) return;
+  if (inflight[id]) { dirty[id] = true; return; }
+  inflight[id] = true;
+  try {
+    await db.doc("log/" + id).set(cleanEntry(id));
+  } catch (err) {
+    if (err && (err.code === "invalid_argument" || err.code === "transform_error")) {
+      canWrite = false; setSync("readonly");
+    }
+  }
+  inflight[id] = false;
+  if (dirty[id]) { dirty[id] = false; persist(id); }
+}
+
+function setSync(mode) {
+  const el = document.getElementById("sync");
+  const label = document.getElementById("syncLabel");
+  el.classList.remove("synced", "readonly");
+  if (mode === "synced") { el.classList.add("synced"); label.textContent = "Synced with your partner"; }
+  else if (mode === "readonly") { el.classList.add("readonly"); label.textContent = "View-only — ask to be invited as editor"; }
+  else { label.textContent = "Saved on this device"; }
+}
+
+async function initSync() {
+  loadLocal();
+  render();
+  if (!(window.claude && typeof window.claude.use === "function")) { setSync("local"); return; }
+  try { db = await claude.use("db"); } catch (e) { db = null; }
+  if (!db) { setSync("local"); return; }
+  setSync("synced");
+  // One live subscription to the whole shared log.
+  db.collection("log").onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      const id = ch.doc.id;
+      if (ch.type === "removed") { delete LOG[id]; }
+      else { LOG[id] = Object.assign({}, ch.doc.data()); }
+    });
+    saveLocal();
+    render();
+    refreshSheetLive();
+  }, err => {
+    if (err && err.code === "revoked") { db = null; setSync("local"); }
+  });
+}
 
 function levelLabel(l) { return l.charAt(0).toUpperCase() + l.slice(1); }
-
 function matches(p, filter) {
-  if (filter === "favs") return favs.has(p.id);
-  if (filter === "tried") return tried.has(p.id);
+  if (filter === "favs") return isFav(p.id);
+  if (filter === "tried") return isTried(p.id);
   if (["easy","medium","adventurous"].includes(filter)) return p.level === filter;
   return true;
 }
@@ -644,7 +392,6 @@ function render() {
     }
     return true;
   });
-
   grid.innerHTML = "";
   if (!list.length) {
     let msg = "Try another search.";
@@ -653,30 +400,26 @@ function render() {
     grid.innerHTML = `<div class="empty">Nothing here yet.<br>${msg}</div>`;
     return;
   }
-
   for (const p of list) {
     const card = document.createElement("button");
     card.className = "card";
     card.setAttribute("aria-label", "Open " + p.name);
-    const badges = `${tried.has(p.id) ? '<span class="b" title="Tried">✓</span>' : ""}${ratings[p.id] ? `<span class="b rate" title="${ratings[p.id]} of 5">${"★".repeat(ratings[p.id])}</span>` : ""}`;
+    const badges = `${isTried(p.id) ? '<span class="b" title="Tried">✓</span>' : ""}${ratingOf(p.id) ? `<span class="b rate" title="${ratingOf(p.id)} of 5">${"★".repeat(ratingOf(p.id))}</span>` : ""}`;
     card.innerHTML = `
-      <button class="heart" aria-pressed="${favs.has(p.id)}" aria-label="Save to favorites">♥</button>
+      <button class="heart" aria-pressed="${isFav(p.id)}" aria-label="Save to favorites">♥</button>
       <div class="row"><span class="level ${p.level}">${levelLabel(p.level)}</span></div>
       <h3>${p.name}</h3>
       <p class="blurb">${p.blurb}</p>
       <span class="tag">${p.tags.join(" · ")}</span>
       ${badges ? `<div class="card-badges">${badges}</div>` : ""}
     `;
-    card.addEventListener("click", (e) => {
-      if (e.target.classList.contains("heart")) return;
-      openSheet(p);
-    });
+    card.addEventListener("click", (e) => { if (e.target.classList.contains("heart")) return; openSheet(p); });
     const heart = card.querySelector(".heart");
     heart.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (favs.has(p.id)) favs.delete(p.id); else favs.add(p.id);
-      saveFavs();
-      heart.setAttribute("aria-pressed", favs.has(p.id));
+      entry(p.id).fav = !isFav(p.id);
+      persist(p.id);
+      heart.setAttribute("aria-pressed", isFav(p.id));
       if (activeFilter === "favs") render();
     });
     grid.appendChild(card);
@@ -685,56 +428,48 @@ function render() {
 
 function openSheet(p) {
   closeWheel();
+  currentId = p.id;
   sheet.innerHTML = `
     <button class="close" id="closeBtn" aria-label="Close">×</button>
     <h2 id="sheet-title">${p.name}</h2>
-    <div class="meta">
-      <span class="level ${p.level}">${levelLabel(p.level)}</span>
-      <span class="pill">Closeness: ${p.intimacy}</span>
-    </div>
+    <div class="meta"><span class="level ${p.level}">${levelLabel(p.level)}</span><span class="pill">Closeness: ${p.intimacy}</span></div>
     <p class="blurb" style="font-size:15px;color:var(--fg)">${p.blurb}</p>
     <section><h4>How to do it</h4><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol></section>
     <section><h4>Tips</h4><ul class="tips">${p.tips.map(t => `<li>${t}</li>`).join("")}</ul></section>
     <section><h4>Vibe</h4><div class="pill-row">${p.tags.map(t => `<span class="pill">${t}</span>`).join("")}</div></section>
     <div class="tracker">
-      <h4 style="color:var(--accent);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;font-weight:700">Your log</h4>
+      <h4 style="color:var(--accent);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;font-weight:700">Your shared log</h4>
       <div class="tried-row">
-        <button class="toggle" id="triedBtn" aria-pressed="${tried.has(p.id)}">${tried.has(p.id) ? "✓ Tried it" : "Mark as tried"}</button>
+        <button class="toggle" id="triedBtn" aria-pressed="${isTried(p.id)}">${isTried(p.id) ? "✓ Tried it" : "Mark as tried"}</button>
         <div class="stars" id="stars" role="group" aria-label="Rate this">
-          ${[1,2,3,4,5].map(n => `<button data-star="${n}" class="${ratings[p.id] >= n ? "on" : ""}" aria-label="${n} star${n>1?"s":""}">★</button>`).join("")}
+          ${[1,2,3,4,5].map(n => `<button data-star="${n}" class="${ratingOf(p.id) >= n ? "on" : ""}" aria-label="${n} star${n>1?"s":""}">★</button>`).join("")}
         </div>
       </div>
-      <textarea class="note" id="note" placeholder="Private notes — what you loved, what to try next time…">${(notes[p.id] || "").replace(/</g,"&lt;")}</textarea>
+      <textarea class="note" id="note" placeholder="Shared notes — what you both loved, what to try next time…">${noteOf(p.id).replace(/</g,"&lt;")}</textarea>
       <div class="note-saved" id="noteSaved"></div>
     </div>
   `;
   sheet.querySelector("#closeBtn").addEventListener("click", closeSheet);
 
-  // Tried toggle
   const triedBtn = sheet.querySelector("#triedBtn");
   triedBtn.addEventListener("click", () => {
-    if (tried.has(p.id)) tried.delete(p.id); else tried.add(p.id);
-    saveTried();
-    triedBtn.setAttribute("aria-pressed", tried.has(p.id));
-    triedBtn.textContent = tried.has(p.id) ? "✓ Tried it" : "Mark as tried";
+    entry(p.id).tried = !isTried(p.id);
+    persist(p.id);
+    triedBtn.setAttribute("aria-pressed", isTried(p.id));
+    triedBtn.textContent = isTried(p.id) ? "✓ Tried it" : "Mark as tried";
   });
 
-  // Star rating (tap same star again to clear)
   const starWrap = sheet.querySelector("#stars");
   starWrap.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-star]");
     if (!b) return;
     const n = +b.dataset.star;
-    if (ratings[p.id] === n) delete ratings[p.id]; else ratings[p.id] = n;
-    saveRatings();
-    [...starWrap.children].forEach(s => s.classList.toggle("on", ratings[p.id] >= +s.dataset.star));
-    if (ratings[p.id] && !tried.has(p.id)) { // rating implies you tried it
-      tried.add(p.id); saveTried();
-      triedBtn.setAttribute("aria-pressed", "true"); triedBtn.textContent = "✓ Tried it";
-    }
+    entry(p.id).rating = (ratingOf(p.id) === n) ? 0 : n;
+    if (ratingOf(p.id) && !isTried(p.id)) { entry(p.id).tried = true; triedBtn.setAttribute("aria-pressed","true"); triedBtn.textContent = "✓ Tried it"; }
+    persist(p.id);
+    [...starWrap.children].forEach(s => s.classList.toggle("on", ratingOf(p.id) >= +s.dataset.star));
   });
 
-  // Notes (debounced autosave)
   const noteEl = sheet.querySelector("#note");
   const savedEl = sheet.querySelector("#noteSaved");
   let noteTimer;
@@ -742,21 +477,36 @@ function openSheet(p) {
     clearTimeout(noteTimer);
     noteTimer = setTimeout(() => {
       const v = noteEl.value.trim();
-      if (v) notes[p.id] = v; else delete notes[p.id];
-      saveNotes();
-      savedEl.textContent = "Saved ✓";
-      setTimeout(() => { savedEl.textContent = ""; }, 1500);
-    }, 400);
+      entry(p.id).note = v;
+      persist(p.id);
+      savedEl.textContent = db && canWrite ? "Saved & synced ✓" : "Saved ✓";
+      setTimeout(() => { savedEl.textContent = ""; }, 1600);
+    }, 450);
   });
 
   scrim.classList.add("open");
   sheet.classList.add("open");
   sheet.scrollTop = 0;
 }
+
+// When a partner's change streams in while the sheet is open, reflect it —
+// but never clobber a note the viewer is actively typing.
+function refreshSheetLive() {
+  if (!currentId || !sheet.classList.contains("open")) return;
+  const id = currentId;
+  const triedBtn = sheet.querySelector("#triedBtn");
+  if (triedBtn) { triedBtn.setAttribute("aria-pressed", isTried(id)); triedBtn.textContent = isTried(id) ? "✓ Tried it" : "Mark as tried"; }
+  const starWrap = sheet.querySelector("#stars");
+  if (starWrap) [...starWrap.children].forEach(s => s.classList.toggle("on", ratingOf(id) >= +s.dataset.star));
+  const noteEl = sheet.querySelector("#note");
+  if (noteEl && document.activeElement !== noteEl) noteEl.value = noteOf(id);
+}
+
 function closeSheet() {
   sheet.classList.remove("open");
+  currentId = null;
   if (!wheelbox.classList.contains("open")) scrim.classList.remove("open");
-  render(); // refresh tried/rating badges on cards
+  render();
 }
 
 scrim.addEventListener("click", () => { closeSheet(); closeWheel(); });
@@ -771,10 +521,8 @@ chips.addEventListener("click", (e) => {
 });
 search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); render(); });
 
-// Surprise Us — open a random position from whatever's currently filtered/searched
 document.getElementById("surprise").addEventListener("click", () => {
-  const pool = POSITIONS.filter(p => matches(p, activeFilter) && (!query ||
-    (p.name + " " + p.blurb + " " + p.tags.join(" ")).toLowerCase().includes(query)));
+  const pool = POSITIONS.filter(p => matches(p, activeFilter) && (!query || (p.name + " " + p.blurb + " " + p.tags.join(" ")).toLowerCase().includes(query)));
   const src = pool.length ? pool : POSITIONS;
   openSheet(src[Math.floor(Math.random() * src.length)]);
 });
@@ -789,80 +537,47 @@ let wheelFilter = "all";
 let wheelItems = [];
 let rotation = 0;
 let spinning = false;
-
 const SLICE_COLORS = ["#b23a63","#8a2f7c","#c0607f","#9a4a86","#d1788f","#7a3a73"];
 
 function buildWheelItems() {
   wheelItems = POSITIONS.filter(p => matches(p, wheelFilter));
   if (wheelItems.length < 2) wheelItems = POSITIONS.slice();
 }
-
 function drawWheel() {
-  const n = wheelItems.length;
-  const cx = 300, cy = 300, r = 300;
+  const n = wheelItems.length, cx = 300, cy = 300, r = 300;
   ctx.clearRect(0, 0, 600, 600);
   const arc = (Math.PI * 2) / n;
   for (let i = 0; i < n; i++) {
     const a0 = i * arc, a1 = a0 + arc;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, a0, a1);
-    ctx.closePath();
-    ctx.fillStyle = SLICE_COLORS[i % SLICE_COLORS.length];
-    ctx.fill();
-    // label
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(a0 + arc / 2);
-    ctx.textAlign = "right";
-    ctx.fillStyle = "#fff";
-    ctx.font = "600 20px Inter, sans-serif";
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, a0, a1); ctx.closePath();
+    ctx.fillStyle = SLICE_COLORS[i % SLICE_COLORS.length]; ctx.fill();
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(a0 + arc / 2);
+    ctx.textAlign = "right"; ctx.fillStyle = "#fff"; ctx.font = "600 20px Inter, sans-serif";
     const label = wheelItems[i].name;
     ctx.fillText(label.length > 16 ? label.slice(0, 15) + "…" : label, r - 22, 7);
     ctx.restore();
   }
-  // hub
-  ctx.beginPath(); ctx.arc(cx, cy, 34, 0, Math.PI * 2);
-  ctx.fillStyle = "#fff"; ctx.fill();
-  ctx.fillStyle = "#b23a63"; ctx.font = "700 24px Fraunces, serif";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("♥", cx, cy + 1);
-  ctx.textBaseline = "alphabetic";
+  ctx.beginPath(); ctx.arc(cx, cy, 34, 0, Math.PI * 2); ctx.fillStyle = "#fff"; ctx.fill();
+  ctx.fillStyle = "#b23a63"; ctx.font = "700 24px Fraunces, serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("♥", cx, cy + 1); ctx.textBaseline = "alphabetic";
 }
-
-function openWheel() {
-  closeSheet();
-  buildWheelItems();
-  drawWheel();
-  wheelResult.innerHTML = "";
-  scrim.classList.add("open");
-  wheelbox.classList.add("open");
-}
+function openWheel() { closeSheet(); buildWheelItems(); drawWheel(); wheelResult.innerHTML = ""; scrim.classList.add("open"); wheelbox.classList.add("open"); }
 function closeWheel() { wheelbox.classList.remove("open"); if (!sheet.classList.contains("open")) scrim.classList.remove("open"); }
 
 document.getElementById("openWheel").addEventListener("click", openWheel);
 document.getElementById("wheelClose").addEventListener("click", closeWheel);
-
 wheelFilters.addEventListener("click", (e) => {
   const btn = e.target.closest(".chip");
   if (!btn) return;
   wheelFilter = btn.dataset.wfilter;
   [...wheelFilters.children].forEach(c => c.setAttribute("aria-pressed", c === btn));
-  buildWheelItems();
-  rotation = rotation % 360;
-  canvas.style.transition = "none";
-  canvas.style.transform = `rotate(${rotation}deg)`;
-  drawWheel();
-  wheelResult.innerHTML = "";
+  buildWheelItems(); rotation = rotation % 360;
+  canvas.style.transition = "none"; canvas.style.transform = `rotate(${rotation}deg)`;
+  drawWheel(); wheelResult.innerHTML = "";
 });
-
 document.getElementById("spinBtn").addEventListener("click", () => {
   if (spinning) return;
-  spinning = true;
-  wheelResult.innerHTML = "";
-  const n = wheelItems.length;
-  const arc = 360 / n;
-  const winner = Math.floor(Math.random() * n);
-  // pointer sits at top (-90deg). Land the winner's slice center under it.
+  spinning = true; wheelResult.innerHTML = "";
+  const n = wheelItems.length, arc = 360 / n, winner = Math.floor(Math.random() * n);
   const target = 360 * 5 + (270 - (winner * arc + arc / 2));
   rotation += target;
   canvas.style.transition = "transform 4.5s cubic-bezier(.17,.67,.12,.99)";
@@ -872,16 +587,14 @@ document.getElementById("spinBtn").addEventListener("click", () => {
     const p = wheelItems[winner];
     wheelResult.innerHTML = `<strong>${p.name}</strong><span>${levelLabel(p.level)} · tap below to see how</span>`;
     const go = document.createElement("button");
-    go.className = "btn btn-primary";
-    go.style.marginTop = "10px";
-    go.textContent = "Show me →";
+    go.className = "btn btn-primary"; go.style.marginTop = "10px"; go.textContent = "Show me →";
     go.addEventListener("click", () => openSheet(p));
     wheelResult.appendChild(document.createElement("br"));
     wheelResult.appendChild(go);
   }, 4600);
 });
 
-// Theme toggle
+// Theme toggle (per-device)
 const themeBtn = document.getElementById("theme");
 function applyTheme(t) {
   if (t) document.documentElement.setAttribute("data-theme", t);
@@ -892,14 +605,13 @@ let theme = null;
 try { theme = localStorage.getItem("closer-theme"); } catch (e) {}
 applyTheme(theme);
 themeBtn.addEventListener("click", () => {
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark"
-    || (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark" || (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
   theme = isDark ? "light" : "dark";
   try { localStorage.setItem("closer-theme", theme); } catch (e) {}
   applyTheme(theme);
 });
 
-render();
+initSync();
 </script>
 
 </body>
