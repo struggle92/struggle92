@@ -47,3 +47,8 @@ After payment, buyers land on `shop/?paid=bundle` (or `playbook` / `planner`) an
 4. Point the funnel's `PLAYBOOK_CHECKOUT` and your bio links at `/shop/`.
 
 Heads up: on a static host the download files are public to anyone who finds the URL. That's normal for low-priced PDFs. If leaks become a problem, sell through Gumroad or Payhip, which deliver files behind the payment.
+
+## Content engine (`content/`)
+
+30 days of faceless image posts (1080x1350 cards) that point to the shop. Text lives in `content/posts.py`; run `python3 content/build_posts.py` to redraw `content/cards/` and `content/queue.json`.
+The cards are served from the site, so a scheduler (Metricool) can pull them by URL. `queue.json` marks which days are already scheduled.
