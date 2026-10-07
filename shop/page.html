@@ -1,0 +1,283 @@
+<title>Struggle92 Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a short storefront (bundle first, then single products); ?paid=<id> swaps it for the download page */
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #131a2a;
+  --muted: #566078;
+  --line: #dfe3ea;
+  --accent: #e2550f;
+  --accent-ink: #ffffff;
+  --accent-soft: #fde9dc;
+  --good: #1d7a4f;
+  --cover: #131a2a;
+  --cover-ink: #f6f7f9;
+  --f-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1420; --surface: #171e2d; --ink: #eef1f6; --muted: #9aa4ba; --line: #2a3346;
+  --accent: #ff7a33; --accent-ink: #1a0d04; --accent-soft: #3a2415; --good: #4cc38a;
+  --cover: #05080e; --cover-ink: #eef1f6; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1420; --surface: #171e2d; --ink: #eef1f6; --muted: #9aa4ba; --line: #2a3346;
+  --accent: #ff7a33; --accent-ink: #1a0d04; --accent-soft: #3a2415; --good: #4cc38a;
+  --cover: #05080e; --cover-ink: #eef1f6; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--f-body); margin: 0; padding-inline: 16px; }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 28px 64px; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.08; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; }
+h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font: 500 0.75rem/1 var(--f-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); }
+.muted { color: var(--muted); }
+header { display: grid; gap: 14px; }
+header .sub { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; font: 700 1.05rem var(--f-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: var(--r); padding: 15px 22px; cursor: pointer; text-decoration: none; width: 100%; }
+.btn:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+.btn:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* bundle: the main offer */
+.bundle { background: var(--surface); border: 2px solid var(--ink); border-radius: calc(var(--r) + 4px); padding: clamp(20px, 5vw, 32px); display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .bundle { grid-template-columns: 1.1fr 1fr; align-items: center; } }
+.bundle .covers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.price { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.price strong { font: 800 clamp(2.2rem, 7vw, 2.8rem)/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.price s { color: var(--muted); font: 500 1.1rem var(--f-mono); }
+.price span { color: var(--good); font-weight: 600; font-size: .95rem; }
+.info { display: grid; gap: 14px; }
+
+.cover { aspect-ratio: 3 / 4; border-radius: 8px; background: var(--cover); color: var(--cover-ink); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; }
+.cover::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,.04) 22px 23px); }
+.cover b { position: relative; font: 800 clamp(1rem, 3vw, 1.3rem)/1.1 var(--f-display); }
+.cover small { position: relative; font: 500 .68rem var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; align-content: start; }
+.card .cover { aspect-ratio: 16 / 10; }
+.card .price strong { font-size: 1.8rem; }
+
+.list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; font-size: .95rem; }
+.list li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
+.list li::before { content: ""; width: 14px; height: 14px; margin-top: 5px; border-radius: 50%; border: 2px solid var(--good); box-shadow: inset 0 0 0 3px var(--surface), inset 0 0 0 7px var(--good); }
+
+.faq { display: grid; gap: 8px; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 18px; }
+summary { font-weight: 600; cursor: pointer; }
+details p { margin-top: 10px; color: var(--muted); }
+
+/* download page */
+.paid { background: var(--accent-soft); border-radius: var(--r); padding: clamp(20px, 5vw, 32px); display: grid; gap: 16px; }
+.dl { display: grid; gap: 10px; }
+.dl a { display: flex; justify-content: space-between; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; color: var(--ink); text-decoration: none; font-weight: 600; }
+.dl a em { font: 500 .8rem var(--f-mono); font-style: normal; color: var(--accent); white-space: nowrap; }
+.notice { border: 1.5px dashed var(--accent); border-radius: var(--r); padding: 12px 14px; font-size: .9rem; }
+
+footer { display: grid; gap: 8px; font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; }
+footer a { color: inherit; }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <p class="notice" id="setupNotice" hidden></p>
+
+  <main id="store">
+    <div style="display:grid;gap:48px">
+      <header>
+        <p class="eyebrow" id="eyebrow"></p>
+        <h1 id="headline"></h1>
+        <p class="sub" id="sub"></p>
+      </header>
+
+      <section class="bundle" id="bundle" aria-labelledby="bundleTitle"></section>
+
+      <section style="display:grid;gap:18px" aria-labelledby="singlesTitle">
+        <h2 id="singlesTitle">Or grab just one</h2>
+        <div class="grid" id="singles"></div>
+      </section>
+
+      <section style="display:grid;gap:18px" aria-labelledby="faqTitle">
+        <h2 id="faqTitle">Questions</h2>
+        <div class="faq" id="faq"></div>
+      </section>
+    </div>
+  </main>
+
+  <main id="thanks" hidden>
+    <div class="paid">
+      <p class="eyebrow">Payment received</p>
+      <h1 id="thanksTitle"></h1>
+      <p>Your files are below. Bookmark this page so you can download them again on another device.</p>
+      <div class="dl" id="downloads"></div>
+      <p class="muted" id="thanksHelp"></p>
+    </div>
+    <a class="btn ghost" href="./">Back to the shop</a>
+  </main>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+/* ============ EDIT HERE ============
+   1. Create one Stripe Payment Link (or Gumroad/Payhip product) per item and paste it into `checkout`.
+   2. In Stripe, set each link's "After payment" redirect to this page with ?paid=<id>,
+      e.g. https://YOUR-SITE/shop/?paid=bundle   (Gumroad/Payhip deliver the file themselves, so skip this).
+   3. `files` are the downloads shown after payment, relative to this page. */
+const CONFIG = {
+  BRAND: "Struggle92 Media",
+  CONTACT: "weaver71992@gmail.com",
+  REFUND_DAYS: 30
+};
+
+const PRODUCTS = {
+  bundle: {
+    name: "The Side Hustle Starter Bundle",
+    tag: "Best value",
+    blurb: "The content system to get attention plus the money system to keep what you earn. Both downloads, one checkout.",
+    price: 29, was: 31.99,
+    checkout: "",
+    includes: ["playbook", "planner"],
+    points: [
+      "Faceless Shorts Playbook: 60 hooks, 5 formats, 30-day calendar",
+      "Hustle Money Planner: budget, subscription, debt and side hustle trackers",
+      "Instant download, yours to keep",
+      `${CONFIG.REFUND_DAYS}-day refund, no questions`
+    ]
+  },
+  playbook: {
+    name: "Faceless Shorts Playbook",
+    tag: "PDF + 2 spreadsheets",
+    blurb: "Post 30 Shorts in 30 days without showing your face, using free CapCut and Canva.",
+    price: 27,
+    checkout: "",
+    files: [
+      ["Playbook + hook bank + 30-day calendar (.zip)", "../products/shorts-playbook/Faceless_Shorts_Playbook.zip"],
+      ["Playbook only (.pdf)", "../products/shorts-playbook/Faceless_Shorts_Playbook.pdf"]
+    ],
+    points: ["60 fill-in-the-blank hooks", "5 faceless video formats", "30-day posting calendar (CSV)", "Batch-day checklist"]
+  },
+  planner: {
+    name: "Hustle Money Planner",
+    tag: "16-page printable",
+    blurb: "Budget, track subscriptions, pay off debt and see your real side hustle profit in 10 minutes a week.",
+    price: 4.99,
+    image: "../products/money-planner/listing_cover.png",
+    checkout: "",
+    files: [["Hustle Money Planner (.pdf)", "../products/money-planner/Hustle_Money_Planner.pdf"]],
+    points: ["Zero-based monthly budget", "Subscription tracker", "Debt payoff plan", "Side hustle sales log"]
+  }
+};
+
+const FAQ = [
+  ["How do I get my files?", "Right after checkout you land on a download page. Your receipt email has the link too, so you can download again any time."],
+  ["Is anything shipped?", "No. These are digital downloads. Print the planner at home or use it in GoodNotes, Notability or Xodo."],
+  ["Will this make me money?", "No product can promise that. The playbook teaches a content system and the planner helps you track money. Results depend on your work, your niche and luck, and most people earn little at first."],
+  ["What if it's not for me?", `Reply to your receipt within ${CONFIG.REFUND_DAYS} days for a full refund.`],
+  ["Can I resell these?", "No. They're licensed for personal use only."]
+];
+
+/* ============ PAGE LOGIC ============ */
+const $ = id => document.getElementById(id);
+const money = n => "$" + (Number.isInteger(n) ? n : n.toFixed(2));
+const el = (tag, attrs = {}, kids = []) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "text" ? n.textContent = v : n.setAttribute(k, v);
+  [].concat(kids).forEach(k => k && n.append(k));
+  return n;
+};
+
+function cover(p) {
+  const c = el("div", { class: "cover", "aria-hidden": "true" });
+  if (p.image) c.append(el("img", { src: p.image, alt: "", loading: "lazy" }));
+  else c.append(el("small", { text: p.tag }), el("b", { text: p.name }));
+  return c;
+}
+
+function buyButton(id, label) {
+  const url = PRODUCTS[id].checkout;
+  const a = el("a", { class: "btn", text: label });
+  if (url) { a.href = url; a.rel = "noopener"; }
+  else { a.setAttribute("aria-disabled", "true"); a.title = "Checkout link not set yet"; }
+  return a;
+}
+
+function priceRow(p) {
+  return el("div", { class: "price" }, [
+    el("strong", { text: money(p.price) }),
+    p.was ? el("s", { text: money(p.was) }) : null,
+    p.was ? el("span", { text: `Save ${money(+(p.was - p.price).toFixed(2))}` }) : null
+  ]);
+}
+
+function renderStore() {
+  $("eyebrow").textContent = CONFIG.BRAND;
+  $("headline").textContent = "Tools to start a side hustle and keep track of the money";
+  $("sub").textContent = "Two instant downloads made for people working a job and building something on the side.";
+
+  const b = PRODUCTS.bundle;
+  $("bundle").append(
+    el("div", { class: "covers" }, b.includes.map(id => cover(PRODUCTS[id]))),
+    el("div", { class: "info" }, [
+      el("p", { class: "eyebrow", text: b.tag }),
+      el("h2", { id: "bundleTitle", text: b.name }),
+      el("p", { class: "muted", text: b.blurb }),
+      priceRow(b),
+      el("ul", { class: "list" }, b.points.map(t => el("li", { text: t }))),
+      buyButton("bundle", `Get both for ${money(b.price)}`)
+    ])
+  );
+
+  ["playbook", "planner"].forEach(id => {
+    const p = PRODUCTS[id];
+    $("singles").append(el("article", { class: "card" }, [
+      cover(p),
+      el("h3", { text: p.name }),
+      el("p", { class: "muted", text: p.blurb }),
+      el("ul", { class: "list" }, p.points.map(t => el("li", { text: t }))),
+      priceRow(p),
+      buyButton(id, `Buy for ${money(p.price)}`)
+    ]));
+  });
+
+  FAQ.forEach(([q, a]) => $("faq").append(el("details", {}, [el("summary", { text: q }), el("p", { text: a })])));
+
+  const missing = Object.entries(PRODUCTS).filter(([, p]) => !p.checkout).map(([, p]) => p.name);
+  if (missing.length) {
+    $("setupNotice").hidden = false;
+    $("setupNotice").textContent = `Owner note: no checkout link yet for ${missing.join(", ")}. Paste them into PRODUCTS in shop/page.html and run ./build.sh. This note disappears once all are set.`;
+  }
+}
+
+function renderThanks(id) {
+  const p = PRODUCTS[id];
+  const ids = p.includes || [id];
+  $("store").hidden = true;
+  $("thanks").hidden = false;
+  $("thanksTitle").textContent = `Thanks! Your ${p.name.replace(/^The /, "")} is ready`;
+  ids.flatMap(i => PRODUCTS[i].files).forEach(([label, href]) =>
+    $("downloads").append(el("a", { href, download: "" }, [el("span", { text: label }), el("em", { text: "Download" })])));
+  $("thanksHelp").textContent = `Trouble downloading? Email ${CONFIG.CONTACT} with your receipt and we'll send the files directly.`;
+}
+
+const paid = new URLSearchParams(location.search).get("paid");
+if (paid && PRODUCTS[paid]) renderThanks(paid); else renderStore();
+
+$("footer").append(
+  el("p", { text: `© ${new Date().getFullYear()} ${CONFIG.BRAND}. Digital products for personal use. Nothing is shipped.` }),
+  el("p", { text: "Results vary. Nothing here is a promise of income." }),
+  el("p", {}, [document.createTextNode("Questions: "), el("a", { href: `mailto:${CONFIG.CONTACT}`, text: CONFIG.CONTACT })])
+);
+</script>
