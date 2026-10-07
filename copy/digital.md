@@ -1,16 +1,16 @@
 # Offer 2: Faceless Shorts Playbook ($27 digital product)
 
-You still need to create the product. Outline:
+**Product built:** `products/shorts-playbook/Faceless_Shorts_Playbook.zip`. Listing copy in `products/shorts-playbook/LISTING.md`. Contents:
 
 1. Picking a niche you can post in for 90 days (worksheet)
 2. The 5 faceless formats: list/countdown, screen-record tutorial, text-story over B-roll, voiceover explainer, hands-only demo
 3. 60 hook templates sorted by niche (money, fitness, cooking, tech, motivation, local)
 4. CapCut + Canva free workflow: auto-captions, 9:16 export settings, safe zones
-5. The 30-day calendar (Notion or Google Sheet)
+5. The 30-day calendar (PDF page plus CSV for Google Sheets or Notion)
 6. Monetization map: YouTube Partner Program requirements, TikTok creator rules, affiliate links. Link to each platform's official page instead of quoting numbers that change.
 7. 5-minute weekly review: what to repeat, what to drop
 
-Sell it with Gumroad, Stan Store or Shopify digital products. Put that checkout link in the confirmation email.
+Sell it with Gumroad, Stan Store or Shopify digital products. Paste the checkout link into `PLAYBOOK_CHECKOUT` in `funnel/page.html`; the thank-you screen shows it right after opt-in.
 
 ## VSL script (about 7 min, faceless: screen recording plus voiceover)
 

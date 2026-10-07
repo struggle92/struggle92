@@ -183,6 +183,7 @@ const CONFIG = {
   BRAND: "Struggle92 Media",
   CONTACT: "weaver71992@gmail.com",
   WEBHOOK_URL: "",
+  PLAYBOOK_CHECKOUT: "",  // paste your Gumroad/Payhip/Stripe checkout link for the $27 playbook
   SHOW_SWITCHER: true   // set false before you share a live link
 };
 
@@ -251,12 +252,13 @@ const OFFERS = {
     proof: 3,
     offerLabel: "One-time payment",
     price: "$27", priceNote: "lifetime access and free updates",
-    stack: [["Faceless Shorts Playbook (PDF)", "core"], ["60-hook swipe file", "bonus"], ["30-day Notion calendar", "bonus"], ["Monetization checklist", "bonus"]],
+    stack: [["Faceless Shorts Playbook (PDF)", "core"], ["60-hook swipe file", "bonus"], ["30-day calendar (CSV for Sheets or Notion)", "bonus"], ["Monetization checklist", "bonus"]],
     fields: [["name", "First name", "text"], ["email", "Email for the download link", "email"]],
     submit: "Send me the playbook",
     risk: "Not happy within 30 days? Reply to your receipt email for a full refund.",
     thanksTitle: "Your download is on the way.",
-    thanksBody: "Check your inbox for the checkout link and download. Not there in 5 minutes? Look in Promotions or Spam.",
+    thanksBody: "Last step: complete checkout and the download arrives instantly. ",
+    afterText: "Go to checkout",
     faq: [
       ["Will I make money with this?", "This playbook teaches a content system. Most people who post Shorts earn nothing at first. Earnings depend on your niche, consistency and platform rules. We make no income guarantee."],
       ["Do I need to buy software?", "No. Everything uses free versions of CapCut and Canva on your phone."],
@@ -380,7 +382,8 @@ $("form").addEventListener("submit", async e => {
   if (CONFIG.WEBHOOK_URL) { try { await fetch(CONFIG.WEBHOOK_URL, { method: "POST", body: JSON.stringify(lead) }); } catch (_) {} }
   const o = OFFERS[current];
   $("thanksBody").textContent = o.thanksBody;
-  if (o.afterLink) { const a = el("a", "", "open the trial page"); a.href = o.afterLink; a.target = "_blank"; a.rel = "noopener sponsored"; $("thanksBody").append(a, document.createTextNode(".")); }
+  const after = current === "digital" ? CONFIG.PLAYBOOK_CHECKOUT : o.afterLink;
+  if (after) { const a = el("a", "", o.afterText || "open the trial page"); a.href = after; a.target = "_blank"; a.rel = current === "digital" ? "noopener" : "noopener sponsored"; $("thanksBody").append(a, document.createTextNode(".")); }
   $("form").hidden = true; $("thanks").hidden = false;
 });
 
