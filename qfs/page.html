@@ -1,0 +1,211 @@
+<title>Quick Fix Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one page for Quick Fix Studios (services, prices, plans) ending in a booking form that texts or emails the request */
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --ink: #16201a;
+  --muted: #56645a;
+  --line: #dde3dc;
+  --accent: #1f7a45;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2f1e7;
+  --warn: #9a5b00;
+  --f-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1511; --surface: #18201a; --ink: #edf2ee; --muted: #9aaa9f; --line: #2a352d;
+  --accent: #4cc37f; --accent-ink: #06150c; --accent-soft: #1d3325; --warn: #f0b04a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1511; --surface: #18201a; --ink: #edf2ee; --muted: #9aaa9f; --line: #2a352d;
+  --accent: #4cc37f; --accent-ink: #06150c; --accent-soft: #1d3325; --warn: #f0b04a; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.6 var(--f-body); margin: 0; padding-inline: 16px; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 64px; display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.08; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; }
+h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font: 500 0.75rem/1 var(--f-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); }
+.muted { color: var(--muted); }
+header { display: grid; gap: 14px; }
+header .sub { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+.note { border: 1.5px dashed var(--warn); color: var(--warn); border-radius: var(--r); padding: 12px 14px; font-size: .95rem; }
+.note[hidden] { display: none; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; font: 700 1.05rem var(--f-body); background: var(--accent); color: var(--accent-ink); border: 0; border-radius: var(--r); padding: 15px 22px; cursor: pointer; text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn:hover { filter: brightness(1.06); }
+.btn:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.founding { background: var(--accent-soft); border-radius: calc(var(--r) + 4px); padding: clamp(18px, 4vw, 26px); display: grid; gap: 8px; }
+
+section { display: grid; gap: 18px; }
+.grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 680px) { .grid.three { grid-template-columns: repeat(3, 1fr); } .grid.two { grid-template-columns: repeat(2, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 10px; align-content: start; }
+.card ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.card li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 6px; font-size: .97rem; }
+.card li:last-child { border-bottom: 0; padding-bottom: 0; }
+.card li b { font: 500 .92rem var(--f-mono); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.plan .price { font: 800 1.9rem/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.plan .price small { font: 500 .9rem var(--f-body); color: var(--muted); }
+
+form { background: var(--surface); border: 2px solid var(--ink); border-radius: calc(var(--r) + 4px); padding: clamp(18px, 4vw, 28px); display: grid; gap: 14px; }
+label { display: grid; gap: 6px; font-weight: 600; font-size: .95rem; }
+input, select, textarea { font: 400 1rem var(--f-body); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px; width: 100%; }
+textarea { min-height: 96px; resize: vertical; }
+.row { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 600px) { .row { grid-template-columns: 1fr 1fr; } }
+.done { display: none; gap: 8px; }
+.done.show { display: grid; }
+footer { font-size: .85rem; color: var(--muted); display: grid; gap: 6px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow" id="area"></p>
+    <h1 id="brand"></h1>
+    <p class="sub" id="tagline"></p>
+    <div class="ctas">
+      <a class="btn" href="#book">Request a job</a>
+      <a class="btn ghost" id="callBtn" href="#">Call or text</a>
+    </div>
+    <p class="note" id="setupNotice" hidden></p>
+  </header>
+
+  <div class="founding">
+    <h3>Founding client offer: 6 spots</h3>
+    <p id="foundingText"></p>
+  </div>
+
+  <section>
+    <h2>Services and prices</h2>
+    <p class="muted">Flat prices are for a standard job. Materials are extra and you see the receipt. Bigger or odd jobs get a free quote first.</p>
+    <div class="grid three" id="services"></div>
+  </section>
+
+  <section>
+    <h2>Monthly plans</h2>
+    <p class="muted">Plan members are VIPs: booked within 48 hours, 10% off any extra work, cancel any time.</p>
+    <div class="grid three" id="plans"></div>
+  </section>
+
+  <section id="book">
+    <h2>Request a job</h2>
+    <form id="form" novalidate>
+      <div class="row">
+        <label>Your name<input name="name" autocomplete="name" required></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" required></label>
+      </div>
+      <div class="row">
+        <label>Service<select name="service" id="serviceSelect"></select></label>
+        <label>Neighborhood or street<input name="where" autocomplete="address-line1" placeholder="e.g. Afton Village"></label>
+      </div>
+      <div class="row">
+        <label>Best day<input name="day" type="date"></label>
+        <label>Best time<select name="time"><option>Morning</option><option>Afternoon</option><option>Evening</option><option>Any time</option></select></label>
+      </div>
+      <label>What needs doing?<textarea name="details" placeholder="A photo helps. Send one in the text after this."></textarea></label>
+      <label>How did you hear about us?<select name="source"><option>Facebook Marketplace</option><option>Facebook group</option><option>Google</option><option>TikTok</option><option>Snapchat</option><option>Flyer</option><option>Friend or neighbor</option><option>Other</option></select></label>
+      <div class="ctas">
+        <button class="btn" type="submit" data-via="sms">Send by text</button>
+        <button class="btn ghost" type="submit" data-via="email" id="emailBtn">Send by email</button>
+      </div>
+      <div class="done" id="done">
+        <h3>Almost done</h3>
+        <p>Your text or email app opened with the request filled in. Hit send there and we'll reply the same day to confirm a time. If nothing opened, copy it:</p>
+        <textarea id="copyBox" readonly></textarea>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <p id="legal"></p>
+    <p>Prices are starting prices for standard jobs and can change after we see the work. Nothing is charged until you approve a quote.</p>
+  </footer>
+</div>
+
+<script>
+// Owner settings. Fill PHONE (and EMAIL if you want email requests), then run ./build.sh and redeploy.
+const CONFIG = {
+  BRAND: "Quick Fix Studios",
+  AREA: "Concord, Kannapolis & Harrisburg, NC",
+  TAGLINE: "Handyman jobs, yard work and pet waste cleanup. One text, one crew, done right.",
+  PHONE: "",   // e.g. "7045551234" (digits only). Requests are texted here.
+  EMAIL: "",   // optional, e.g. "quickfixstudios@gmail.com"
+  FOUNDING: "Our first 6 clients get one service free (up to $100 of labor). No strings. If you're happy, an honest review on Google or Facebook helps a new local business more than you know.",
+  LEGAL: "Quick Fix Studios · Locally owned",  // add " · Insured" once the liability policy is active
+};
+
+const SERVICES = [
+  { group: "Handyman", note: "$65/hr after the flat-rate jobs, 1-hour minimum", items: [
+    ["TV mount (up to 65\")", "$99"], ["Light fixture or fan swap", "$95"], ["Faucet swap", "$110"],
+    ["Drywall patch", "from $85"], ["Furniture assembly", "from $65"], ["Door fix or adjust", "$75"] ] },
+  { group: "Yard", note: "Standard lot up to 1/4 acre", items: [
+    ["Mow, edge and blow", "$45"], ["Hedge trim", "from $75"], ["Leaf cleanup", "from $120"],
+    ["Gutter clean (1 story)", "$110"], ["Mulch install, labor", "from $90"], ["Haul-off, truck load", "from $85"] ] },
+  { group: "Pet waste", note: "Gate code or unlocked gate needed", items: [
+    ["Weekly scoop, 1 dog", "$18/visit"], ["Each extra dog", "+$5/visit"], ["Every other week", "$25/visit"],
+    ["One-time cleanup", "from $60"], ["Built-up yard reset", "from $90"], ["Bags hauled away", "included"] ] },
+];
+
+const PLANS = [
+  { name: "Scoop Plan", price: "$72", per: "/mo", lines: ["Weekly pet waste scoop, 1 dog", "Waste bagged and hauled away", "Text when done, with a photo"] },
+  { name: "Yard Plan", price: "$149", per: "/mo", lines: ["Mow, edge and blow every 2 weeks", "Weekly scoop included", "Seasonal hedge trim at 10% off"] },
+  { name: "Home Care Plan", price: "$49", per: "/mo", lines: ["1 handyman hour every month", "Unused hour rolls over 1 month", "Priority booking for repairs"] },
+];
+
+const $ = id => document.getElementById(id);
+$("brand").textContent = CONFIG.BRAND;
+$("area").textContent = CONFIG.AREA;
+$("tagline").textContent = CONFIG.TAGLINE;
+$("foundingText").textContent = CONFIG.FOUNDING;
+$("legal").textContent = CONFIG.LEGAL;
+document.title = `${CONFIG.BRAND} · ${CONFIG.AREA}`;
+
+$("services").innerHTML = SERVICES.map(s => `
+  <div class="card"><h3>${s.group}</h3><p class="muted">${s.note}</p>
+  <ul>${s.items.map(([n, p]) => `<li><span>${n}</span><b>${p}</b></li>`).join("")}</ul></div>`).join("");
+$("plans").innerHTML = PLANS.map(p => `
+  <div class="card plan"><h3>${p.name}</h3><p class="price">${p.price}<small>${p.per}</small></p>
+  <ul>${p.lines.map(l => `<li><span>${l}</span></li>`).join("")}</ul></div>`).join("");
+$("serviceSelect").innerHTML = [...SERVICES.flatMap(s => s.items.map(([n]) => `${s.group}: ${n}`)), ...PLANS.map(p => `Plan: ${p.name}`), "Something else"]
+  .map(o => `<option>${o}</option>`).join("");
+
+if (CONFIG.PHONE) {
+  $("callBtn").href = `tel:${CONFIG.PHONE}`;
+} else {
+  $("callBtn").hidden = true;
+  $("setupNotice").hidden = false;
+  $("setupNotice").textContent = "Owner note: set PHONE in CONFIG in qfs/page.html and run ./build.sh. Until then requests can't be sent. This note disappears once it's set.";
+}
+if (!CONFIG.EMAIL) $("emailBtn").hidden = true;
+
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  if (!f.get("name") || !f.get("phone")) { alert("Please add your name and phone."); return; }
+  const msg = [`New job request for ${CONFIG.BRAND}`, `Name: ${f.get("name")}`, `Phone: ${f.get("phone")}`,
+    `Service: ${f.get("service")}`, `Where: ${f.get("where") || "-"}`, `When: ${f.get("day") || "flexible"}, ${f.get("time")}`,
+    `Details: ${f.get("details") || "-"}`, `Heard about us: ${f.get("source")}`].join("\n");
+  $("copyBox").value = msg;
+  $("done").classList.add("show");
+  const via = e.submitter?.dataset.via || "sms";
+  if (via === "email" && CONFIG.EMAIL) {
+    location.href = `mailto:${CONFIG.EMAIL}?subject=${encodeURIComponent("Job request: " + f.get("service"))}&body=${encodeURIComponent(msg)}`;
+  } else if (CONFIG.PHONE) {
+    location.href = `sms:${CONFIG.PHONE}?&body=${encodeURIComponent(msg)}`;
+  }
+});
+</script>

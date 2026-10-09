@@ -52,3 +52,8 @@ Heads up: on a static host the download files are public to anyone who finds the
 
 30 days of faceless image posts (1080x1350 cards) that point to the shop. Text lives in `content/posts.py`; run `python3 content/build_posts.py` to redraw `content/cards/` and `content/queue.json`.
 The cards are served from the site, so a scheduler (Metricool) can pull them by URL. `queue.json` marks which days are already scheduled.
+
+## Quick Fix Studios booking page (`qfs/index.html`)
+
+Services, prices, monthly plans and a booking form for the handyman, yard and pet waste business. The form opens the customer's text app (or email) with the request filled in, so it needs no server.
+Set `PHONE` (and optionally `EMAIL`) in `CONFIG` at the top of the script in `qfs/page.html`, then run `./build.sh` and redeploy. Prices live in `SERVICES` and `PLANS` in the same script. Add " · Insured" to `LEGAL` only once the liability policy is active.
