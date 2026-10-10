@@ -1,0 +1,5 @@
+# Paid downloads: the site is public, so keep sellable files out of the repo.
+# Rebuild them with the build scripts in each product folder.
+products/profit-tracker/*.xlsx
+products/flipper-kit/*.pdf
+products/bundle/*.zip
