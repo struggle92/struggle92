@@ -119,7 +119,7 @@ footer a { color: inherit; }
 <script>
 /* ============ EDIT HERE ============
    Checkout and file delivery happen in the Shopify store: each `checkout` is a Shopify product page
-   (or a cart link for the bundle), and Shopify Digital Products emails the download after payment.
+   (or a cart link for the bundle, which applies the BOTH29 code: 9.35% off both = $29), and Shopify Digital Products emails the download after payment.
    Never put paid files in this repo: the site and the repo are public. */
 const CONFIG = {
   BRAND: "Struggle92 Media",
@@ -130,10 +130,10 @@ const CONFIG = {
 const PRODUCTS = {
   bundle: {
     name: "The Side Hustle Starter Bundle",
-    tag: "Both in one checkout",
+    tag: "Best value",
     blurb: "The content system to get attention plus the money system to keep what you earn. Both downloads, one checkout.",
-    price: 31.99,
-    checkout: "https://qfs1-store.myshopify.com/cart/47380676247641:1,47388404252761:1",
+    price: 29, was: 31.99,
+    checkout: "https://qfs1-store.myshopify.com/cart/47380676247641:1,47388404252761:1?discount=BOTH29",
     includes: ["playbook", "planner"],
     points: [
       "Faceless Shorts Playbook: 60 hooks, 5 formats, 30-day calendar",

@@ -38,7 +38,7 @@ Edit text in `content.py`, then run `python3 build_playbook.py` (output is git-i
 
 ## Shop (`shop/index.html`)
 
-A storefront page for the playbook ($27), the planner ($4.99) and both together ($31.99, one checkout).
+A storefront page for the playbook ($27), the planner ($4.99) and both together ($29 via the auto-applied BOTH29 discount code).
 Every buy button goes to the Shopify store (qfs1-store.myshopify.com). Shopify takes the payment and Digital Products emails the download, so files stay behind the payment.
 
 - Each product needs its file attached in Shopify (Apps > Digital Products) or buyers receive nothing.
