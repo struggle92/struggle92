@@ -1,6 +1,6 @@
 # Offer 2: Faceless Shorts Playbook ($27 digital product)
 
-**Product built:** `products/shorts-playbook/Faceless_Shorts_Playbook.zip`. Listing copy in `products/shorts-playbook/LISTING.md`. Contents:
+**Product built:** `products/shorts-playbook/Faceless_Shorts_Playbook.zip` (run `build_playbook.py`; not committed). Listing copy in `products/shorts-playbook/LISTING.md`. Contents:
 
 1. Picking a niche you can post in for 90 days (worksheet)
 2. The 5 faceless formats: list/countdown, screen-record tutorial, text-story over B-roll, voiceover explainer, hands-only demo

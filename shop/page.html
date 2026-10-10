@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Layout: a short storefront (bundle first, then single products); ?paid=<id> swaps it for the download page */
+/* Layout: a short storefront (bundle first, then single products) */
 :root {
   --bg: #f6f7f9;
   --surface: #ffffff;
@@ -79,11 +79,6 @@ details { background: var(--surface); border: 1px solid var(--line); border-radi
 summary { font-weight: 600; cursor: pointer; }
 details p { margin-top: 10px; color: var(--muted); }
 
-/* download page */
-.paid { background: var(--accent-soft); border-radius: var(--r); padding: clamp(20px, 5vw, 32px); display: grid; gap: 16px; }
-.dl { display: grid; gap: 10px; }
-.dl a { display: flex; justify-content: space-between; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; color: var(--ink); text-decoration: none; font-weight: 600; }
-.dl a em { font: 500 .8rem var(--f-mono); font-style: normal; color: var(--accent); white-space: nowrap; }
 .notice { border: 1.5px dashed var(--accent); border-radius: var(--r); padding: 12px 14px; font-size: .9rem; }
 
 footer { display: grid; gap: 8px; font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; }
@@ -116,26 +111,15 @@ footer a { color: inherit; }
     </div>
   </main>
 
-  <main id="thanks" hidden>
-    <div class="paid">
-      <p class="eyebrow">Payment received</p>
-      <h1 id="thanksTitle"></h1>
-      <p>Your files are below. Bookmark this page so you can download them again on another device.</p>
-      <div class="dl" id="downloads"></div>
-      <p class="muted" id="thanksHelp"></p>
-    </div>
-    <a class="btn ghost" href="./">Back to the shop</a>
-  </main>
 
   <footer id="footer"></footer>
 </div>
 
 <script>
 /* ============ EDIT HERE ============
-   1. Create one Stripe Payment Link (or Gumroad/Payhip product) per item and paste it into `checkout`.
-   2. In Stripe, set each link's "After payment" redirect to this page with ?paid=<id>,
-      e.g. https://YOUR-SITE/shop/?paid=bundle   (Gumroad/Payhip deliver the file themselves, so skip this).
-   3. `files` are the downloads shown after payment, relative to this page. */
+   Checkout and file delivery happen in the Shopify store: each `checkout` is a Shopify product page
+   (or a cart link for the bundle), and Shopify Digital Products emails the download after payment.
+   Never put paid files in this repo: the site and the repo are public. */
 const CONFIG = {
   BRAND: "Struggle92 Media",
   CONTACT: "weaver71992@gmail.com",
@@ -145,10 +129,10 @@ const CONFIG = {
 const PRODUCTS = {
   bundle: {
     name: "The Side Hustle Starter Bundle",
-    tag: "Best value",
+    tag: "Both in one checkout",
     blurb: "The content system to get attention plus the money system to keep what you earn. Both downloads, one checkout.",
-    price: 29, was: 31.99,
-    checkout: "https://buy.stripe.com/test_7sY8wPc7P2F046v0hRdAk00",
+    price: 31.99,
+    checkout: "https://qfs1-store.myshopify.com/cart/47380676247641:1,47388404252761:1",
     includes: ["playbook", "planner"],
     points: [
       "Faceless Shorts Playbook: 60 hooks, 5 formats, 30-day calendar",
@@ -162,11 +146,7 @@ const PRODUCTS = {
     tag: "PDF + 2 spreadsheets",
     blurb: "Post 30 Shorts in 30 days without showing your face, using free CapCut and Canva.",
     price: 27,
-    checkout: "https://buy.stripe.com/test_9B66oHdbT93o5az1lVdAk01",
-    files: [
-      ["Playbook + hook bank + 30-day calendar (.zip)", "../products/shorts-playbook/Faceless_Shorts_Playbook.zip"],
-      ["Playbook only (.pdf)", "../products/shorts-playbook/Faceless_Shorts_Playbook.pdf"]
-    ],
+    checkout: "https://qfs1-store.myshopify.com/products/faceless-shorts-playbook",
     points: ["60 fill-in-the-blank hooks", "5 faceless video formats", "30-day posting calendar (CSV)", "Batch-day checklist"]
   },
   planner: {
@@ -175,14 +155,13 @@ const PRODUCTS = {
     blurb: "Budget, track subscriptions, pay off debt and see your real side hustle profit in 10 minutes a week.",
     price: 4.99,
     image: "../products/money-planner/listing_cover.png",
-    checkout: "https://buy.stripe.com/test_14A14nb3L93odH52pZdAk02",
-    files: [["Hustle Money Planner (.pdf)", "../products/money-planner/Hustle_Money_Planner.pdf"]],
+    checkout: "https://qfs1-store.myshopify.com/products/the-hustle-money-planner-printable-budget-side-hustle-planner",
     points: ["Zero-based monthly budget", "Subscription tracker", "Debt payoff plan", "Side hustle sales log"]
   }
 };
 
 const FAQ = [
-  ["How do I get my files?", "Right after checkout you land on a download page. Your receipt email has the link too, so you can download again any time."],
+  ["How do I get my files?", "Right after checkout, your order confirmation and email include download links, so you can download again any time."],
   ["Is anything shipped?", "No. These are digital downloads. Print the planner at home or use it in GoodNotes, Notability or Xodo."],
   ["Will this make me money?", "No product can promise that. The playbook teaches a content system and the planner helps you track money. Results depend on your work, your niche and luck, and most people earn little at first."],
   ["What if it's not for me?", `Reply to your receipt within ${CONFIG.REFUND_DAYS} days for a full refund.`],
@@ -261,19 +240,7 @@ function renderStore() {
   }
 }
 
-function renderThanks(id) {
-  const p = PRODUCTS[id];
-  const ids = p.includes || [id];
-  $("store").hidden = true;
-  $("thanks").hidden = false;
-  $("thanksTitle").textContent = `Thanks! Your ${p.name.replace(/^The /, "")} is ready`;
-  ids.flatMap(i => PRODUCTS[i].files).forEach(([label, href]) =>
-    $("downloads").append(el("a", { href, download: "" }, [el("span", { text: label }), el("em", { text: "Download" })])));
-  $("thanksHelp").textContent = `Trouble downloading? Email ${CONFIG.CONTACT} with your receipt and we'll send the files directly.`;
-}
-
-const paid = new URLSearchParams(location.search).get("paid");
-if (paid && PRODUCTS[paid]) renderThanks(paid); else renderStore();
+renderStore();
 
 $("footer").append(
   el("p", { text: `© ${new Date().getFullYear()} ${CONFIG.BRAND}. Digital products for personal use. Nothing is shipped.` }),

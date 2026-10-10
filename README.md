@@ -34,19 +34,16 @@ Edit `scale/page.html`, then run `./build.sh`.
 ## Faceless Shorts Playbook (`products/shorts-playbook/`)
 
 The $27 product behind the `#digital` funnel: an 18-page PDF plus `hook_bank.csv` and `30_day_calendar.csv`, zipped as `Faceless_Shorts_Playbook.zip`.
-Edit text in `content.py`, then run `python3 build_playbook.py` (needs `pip install reportlab`). Listing copy and setup steps are in `LISTING.md`.
+Edit text in `content.py`, then run `python3 build_playbook.py` (output is git-ignored) (needs `pip install reportlab`). Listing copy and setup steps are in `LISTING.md`.
 
 ## Shop (`shop/index.html`)
 
-One storefront that sells both products with automatic delivery: a $29 bundle (playbook + planner), the $27 playbook and the $4.99 planner.
-After payment, buyers land on `shop/?paid=bundle` (or `playbook` / `planner`) and download their files right away. You don't have to do anything.
+A storefront page for the playbook ($27), the planner ($4.99) and both together ($31.99, one checkout).
+Every buy button goes to the Shopify store (qfs1-store.myshopify.com). Shopify takes the payment and Digital Products emails the download, so files stay behind the payment.
 
-1. In Stripe, go to **Payment Links** and create one link per product at the prices above.
-2. In each link's **After payment** settings, choose "Don't show confirmation page" and redirect to `https://YOUR-SITE/shop/?paid=bundle` (or `playbook` / `planner`).
-3. Paste the three links into `checkout` in `PRODUCTS` at the top of the script in `shop/page.html`, run `./build.sh` and redeploy. The owner note at the top of the page disappears once all three links are set.
-4. Point the funnel's `PLAYBOOK_CHECKOUT` and your bio links at `/shop/`.
-
-Heads up: on a static host the download files are public to anyone who finds the URL. That's normal for low-priced PDFs. If leaks become a problem, sell through Gumroad or Payhip, which deliver files behind the payment.
+- Each product needs its file attached in Shopify (Apps > Digital Products) or buyers receive nothing.
+- To change a link, edit `checkout` in `PRODUCTS` at the top of the script in `shop/page.html`, then run `./build.sh` and redeploy.
+- Never commit paid files: this repo and the site are public. Build them locally with each product's build script; `.gitignore` keeps them out.
 
 ## Content engine (`content/`)
 
