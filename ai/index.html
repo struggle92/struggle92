@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local AI</title>
+<style>
+  :root { --bg:#0e0f12; --panel:#17191e; --line:#2a2d35; --text:#e8e9ec; --dim:#8b8f99; --accent:#4f8cff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, sans-serif; display:flex; height:100vh; }
+  aside { width:300px; background:var(--panel); border-right:1px solid var(--line); padding:16px; display:flex; flex-direction:column; gap:10px; overflow:auto; }
+  main { flex:1; display:flex; flex-direction:column; min-width:0; }
+  label { font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.05em; }
+  select, textarea, input, button { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px; font:inherit; }
+  button { background:var(--accent); border:0; cursor:pointer; font-weight:600; }
+  button.ghost { background:transparent; border:1px solid var(--line); }
+  #log { flex:1; overflow:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
+  .msg { max-width:780px; white-space:pre-wrap; word-wrap:break-word; padding:10px 14px; border-radius:10px; }
+  .user { align-self:flex-end; background:#22324f; }
+  .assistant { align-self:flex-start; background:var(--panel); border:1px solid var(--line); }
+  form { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); }
+  form textarea { flex:1; resize:none; height:56px; }
+  form button { width:90px; }
+  #err { color:#ff7b7b; font-size:13px; }
+  @media (max-width:700px) { body { flex-direction:column; } aside { width:auto; max-height:40vh; } }
+</style>
+</head>
+<body>
+<aside>
+  <label>Model</label>
+  <select id="model"></select>
+  <label>System prompt (sets its personality and rules)</label>
+  <textarea id="system" rows="9">You are a blunt, direct assistant. Answer every question fully and plainly. No lectures, no disclaimers, no filler.</textarea>
+  <label>Temperature <span id="tval">0.8</span></label>
+  <input id="temp" type="range" min="0" max="2" step="0.1" value="0.8">
+  <button class="ghost" id="new">New chat</button>
+  <label>Saved chats</label>
+  <select id="history" size="8"></select>
+  <div id="err"></div>
+</aside>
+<main>
+  <div id="log"></div>
+  <form id="f">
+    <textarea id="input" placeholder="Message… (Enter to send, Shift+Enter for newline)"></textarea>
+    <button>Send</button>
+  </form>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+let chat = { id: null, messages: [] };
+
+try { const s = localStorage.getItem("system"); if (s) $("system").value = s; } catch {}
+$("system").oninput = () => { try { localStorage.setItem("system", $("system").value); } catch {} };
+$("temp").oninput = () => $("tval").textContent = $("temp").value;
+
+function render() {
+  $("log").innerHTML = "";
+  for (const m of chat.messages) add(m.role, m.content);
+}
+function add(role, text) {
+  const d = document.createElement("div");
+  d.className = "msg " + role; d.textContent = text;
+  $("log").appendChild(d); $("log").scrollTop = 1e9;
+  return d;
+}
+async function loadModels() {
+  const r = await fetch("/api/models"); const j = await r.json();
+  if (!r.ok) { $("err").textContent = j.error + " — start it with: ollama serve"; return; }
+  if (!j.length) $("err").textContent = "No models yet. Run: ollama pull dolphin-llama3";
+  $("model").innerHTML = j.map(m => `<option>${m}</option>`).join("");
+}
+async function loadHistory() {
+  const ids = await (await fetch("/api/chats")).json();
+  $("history").innerHTML = ids.map(i => `<option>${i}</option>`).join("");
+}
+async function save() {
+  const r = await fetch("/api/save", { method: "POST", body: JSON.stringify({ ...chat, model: $("model").value, system: $("system").value }) });
+  chat.id = (await r.json()).id; loadHistory();
+}
+$("history").onchange = async () => {
+  chat = await (await fetch("/api/chats/" + $("history").value)).json();
+  if (chat.system) $("system").value = chat.system;
+  render();
+};
+$("new").onclick = () => { chat = { id: null, messages: [] }; render(); };
+$("input").onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("f").requestSubmit(); } };
+
+$("f").onsubmit = async e => {
+  e.preventDefault();
+  const text = $("input").value.trim(); if (!text) return;
+  $("input").value = ""; $("err").textContent = "";
+  chat.messages.push({ role: "user", content: text }); add("user", text);
+  const box = add("assistant", "…");
+  const r = await fetch("/api/chat", { method: "POST", body: JSON.stringify({
+    model: $("model").value, system: $("system").value, temperature: $("temp").value, messages: chat.messages }) });
+  if (!r.ok) { box.remove(); chat.messages.pop(); $("err").textContent = (await r.json()).error; return; }
+  const reader = r.body.getReader(), dec = new TextDecoder(); let out = "";
+  for (;;) { const { done, value } = await reader.read(); if (done) break;
+    out += dec.decode(value, { stream: true }); box.textContent = out; $("log").scrollTop = 1e9; }
+  chat.messages.push({ role: "assistant", content: out });
+  save();
+};
+loadModels(); loadHistory();
+</script>
+</body>
+</html>

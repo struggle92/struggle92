@@ -8,3 +8,6 @@ products/shorts-playbook/*.zip
 products/shorts-playbook/*.csv
 products/money-planner/*.pdf
 products/no-pick-routine/*.pdf
+
+# Local AI chat history
+ai/chats/
