@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quick Fix Studios flyer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+/* Print flyer, US Letter. Rendered to PDF/PNG by build_flyer.js. Set PHONE below before printing. */
+@page { size: 8.5in 11in; margin: 0; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 8.5in; height: 11in; }
+body { font-family: "Public Sans", sans-serif; color: #16201a; background: #fff; display: flex; flex-direction: column; }
+.top { background: #1f7a45; color: #fff; padding: .55in .6in .45in; }
+.top small { font: 700 .16in/1 "Public Sans"; letter-spacing: .12em; text-transform: uppercase; opacity: .85; }
+.top h1 { font: 800 .62in/1 "Bricolage Grotesque", sans-serif; margin: .12in 0 .14in; }
+.top p { font-size: .24in; font-weight: 600; }
+.cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: .22in; padding: .4in .6in .25in; }
+.col h2 { font: 800 .3in/1 "Bricolage Grotesque", sans-serif; color: #1f7a45; border-bottom: 3px solid #1f7a45; padding-bottom: .08in; margin-bottom: .1in; }
+.col div { display: flex; justify-content: space-between; gap: .08in; font-size: .17in; padding: .06in 0; border-bottom: 1px solid #dde3dc; }
+.col b { white-space: nowrap; }
+.offer { margin: .1in .6in 0; background: #e2f1e7; border: 3px dashed #1f7a45; border-radius: .12in; padding: .22in .3in; text-align: center; }
+.offer h3 { font: 800 .32in/1.1 "Bricolage Grotesque", sans-serif; }
+.offer p { font-size: .2in; margin-top: .08in; }
+.cta { text-align: center; padding: .3in .6in .2in; }
+.cta .phone { font: 800 .55in/1 "Bricolage Grotesque", sans-serif; }
+.cta p { font-size: .19in; color: #56645a; margin-top: .08in; }
+.tabs { margin-top: auto; display: grid; grid-template-columns: repeat(8, 1fr); border-top: 2px dashed #16201a; height: 1.75in; }
+.tabs div { border-right: 1px dashed #16201a; writing-mode: vertical-rl; transform: rotate(180deg); display: flex; align-items: center; justify-content: center; font-size: .15in; font-weight: 700; text-align: center; padding: .05in; }
+.tabs div:first-child { border-right: 0; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <small>Concord · Kannapolis · Harrisburg</small>
+    <h1>Quick Fix Studios</h1>
+    <p>Handyman · Yard · Pet waste. Flat prices, on time, photo when it's done.</p>
+  </div>
+  <div class="cols">
+    <div class="col"><h2>Handyman</h2>
+      <div><span>TV mount</span><b>$99</b></div><div><span>Light / fan swap</span><b>$95</b></div>
+      <div><span>Faucet swap</span><b>$110</b></div><div><span>Drywall patch</span><b>from $85</b></div>
+      <div><span>Furniture assembly</span><b>from $65</b></div><div><span>Other jobs</span><b>$65/hr</b></div></div>
+    <div class="col"><h2>Yard</h2>
+      <div><span>Mow, edge, blow</span><b>$45</b></div><div><span>Leaf cleanup</span><b>from $120</b></div>
+      <div><span>Hedge trim</span><b>from $75</b></div><div><span>Gutters, 1 story</span><b>$110</b></div>
+      <div><span>Haul-off</span><b>from $85</b></div><div><span>Yard Plan</span><b>$149/mo</b></div></div>
+    <div class="col"><h2>Pet waste</h2>
+      <div><span>Weekly, 1 dog</span><b>$18/visit</b></div><div><span>Extra dog</span><b>+$5</b></div>
+      <div><span>Every other week</span><b>$25/visit</b></div><div><span>One-time cleanup</span><b>from $60</b></div>
+      <div><span>Scoop Plan</span><b>$72/mo</b></div><div><span>Bags hauled away</span><b>included</b></div></div>
+  </div>
+  <div class="offer">
+    <h3>Founding client offer: 6 spots</h3>
+    <p>Our first 6 clients get one service free (up to $100 of labor). No strings.</p>
+  </div>
+  <div class="cta">
+    <div class="phone" id="phone"></div>
+    <p>Text a photo of the job for a price today</p>
+  </div>
+  <div class="tabs" id="tabs"></div>
+<script>
+const PHONE = new URLSearchParams(location.search).get("phone") || "Text: (your number)";
+document.getElementById("phone").textContent = PHONE;
+document.getElementById("tabs").innerHTML = Array(8).fill(`<div>Quick Fix Studios<br>${PHONE}</div>`).join("");
+</script>
+</body>
+</html>

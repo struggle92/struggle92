@@ -57,3 +57,4 @@ The cards are served from the site, so a scheduler (Metricool) can pull them by 
 
 Services, prices, monthly plans and a booking form for the handyman, yard and pet waste business. The form opens the customer's text app (or email) with the request filled in, so it needs no server.
 Set `PHONE` (and optionally `EMAIL`) in `CONFIG` at the top of the script in `qfs/page.html`, then run `./build.sh` and redeploy. Prices live in `SERVICES` and `PLANS` in the same script. Add " · Insured" to `LEGAL` only once the liability policy is active.
+The print flyer is `qfs/flyer.pdf`, with `qfs/flyer.png` for posting. To put your number on it, run `node qfs/build_flyer.js "(704) 555-1234"`.
