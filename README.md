@@ -55,3 +55,10 @@ The cards are served from the site, so a scheduler (Metricool) can pull them by 
 Services, prices, monthly plans and a booking form for the handyman, yard and pet waste business. The form opens the customer's text app (or email) with the request filled in, so it needs no server.
 Set `PHONE` (and optionally `EMAIL`) in `CONFIG` at the top of the script in `qfs/page.html`, then run `./build.sh` and redeploy. Prices live in `SERVICES` and `PLANS` in the same script. Add " · Insured" to `LEGAL` only once the liability policy is active.
 The print flyer is `qfs/flyer.pdf`, with `qfs/flyer.png` for posting. To put your number on it, run `node qfs/build_flyer.js "(704) 555-1234"`.
+
+## Struggle92 AI (`chat/`)
+
+A phone-first AI chat app at `/chat/`. Open it on your phone and use "Add to Home screen" to install it like an app.
+It connects to OpenRouter (many free models), Groq, OpenAI or any OpenAI-compatible server with your own API key. The key, chats and settings stay in that phone's browser.
+It has 6 built-in personas (Straight Talk, Marketplace Seller, Shorts Scriptwriter, Post Writer, Client Finder, Money Coach) plus your own, an "About me" memory, quick buttons, photo input, voice input, read-aloud, saved and searchable chats, backup and restore, and usage tracking.
+It's a single file (`chat/index.html`), so edit it and push. No build step.
