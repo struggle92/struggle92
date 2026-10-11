@@ -400,10 +400,11 @@ function fillSettings() {
   renderPersonas(); renderModelPicks();
 }
 $("provider").onchange = e => { settings.provider = e.target.value; modelCache = []; saveSettings(); fillSettings(); renderHeader(); };
-$("baseUrl").onchange = e => { settings.baseUrl = e.target.value.trim(); saveSettings(); };
-$("apiKey").onchange = e => { settings.keys[settings.provider] = e.target.value.trim(); saveSettings(); refresh(); if (apiKey()) toast("Key saved on this phone"); };
-$("model").onchange = e => { settings.models[settings.provider] = e.target.value.trim(); saveSettings(); renderHeader(); };
-$("aboutMe").onchange = e => { settings.aboutMe = e.target.value; saveSettings(); };
+$("baseUrl").oninput = e => { settings.baseUrl = e.target.value.trim(); saveSettings(); };
+// Save the key on every keystroke/paste (iOS Safari may not fire 'change' before the drawer closes).
+$("apiKey").oninput = e => { const was = !!apiKey(); settings.keys[settings.provider] = e.target.value.trim(); saveSettings(); renderHeader(); if (!was && apiKey()) toast("Key saved on this phone"); };
+$("model").oninput = e => { settings.models[settings.provider] = e.target.value.trim(); saveSettings(); renderHeader(); };
+$("aboutMe").oninput = e => { settings.aboutMe = e.target.value; saveSettings(); };
 $("temp").oninput = e => { settings.temperature = +e.target.value; $("tempVal").textContent = e.target.value; saveSettings(); };
 $("maxTokens").onchange = e => { settings.maxTokens = Math.max(64, +e.target.value || 2048); saveSettings(); };
 $("autoSpeak").onchange = e => { settings.autoSpeak = e.target.value; saveSettings(); };
