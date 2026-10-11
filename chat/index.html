@@ -170,7 +170,9 @@ textarea.field { resize:vertical; }
         <option value="custom">Custom (any OpenAI-compatible URL)</option>
       </select>
       <input class="field" id="baseUrl" placeholder="https://your-server/v1" hidden>
-      <input class="field" id="apiKey" type="password" placeholder="Paste your API key" autocomplete="off">
+      <input class="field" id="apiKey" type="text" inputmode="text" placeholder="Paste your API key here" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="two"><button type="button" class="btn sm primary" id="saveKey">Save key</button><button type="button" class="btn sm" id="testKey">Test key</button></div>
+      <p class="hint" id="keyStatus"></p>
       <p class="hint" id="keyHint"></p>
 
       <div class="label">Model</div>
@@ -200,6 +202,7 @@ textarea.field { resize:vertical; }
       <p class="hint" id="usage"></p>
       <button type="button" class="btn sm danger" id="wipe">Delete all chats</button>
       <p class="hint">Your key, chats and settings stay on this phone only. Messages go straight from your phone to the AI service you pick.</p>
+      <p class="hint" style="opacity:.6">App version v3 · If this says v3 you have the latest.</p>
     </div>
   </div>
 </aside>
@@ -397,12 +400,31 @@ function fillSettings() {
   $("aboutMe").value = settings.aboutMe; $("temp").value = settings.temperature; $("tempVal").textContent = settings.temperature;
   $("maxTokens").value = settings.maxTokens; $("autoSpeak").value = settings.autoSpeak; $("theme").value = settings.theme;
   const u = settings.usage; $("usage").textContent = `${u.in.toLocaleString()} tokens in · ${u.out.toLocaleString()} tokens out` + (u.cost ? ` · about $${u.cost.toFixed(4)} spent` : " · $0 spent");
-  renderPersonas(); renderModelPicks();
+  renderKeyStatus(); renderPersonas(); renderModelPicks();
+}
+function renderKeyStatus() {
+  const el = $("keyStatus"); const k = apiKey();
+  if (settings.provider === "custom") { el.textContent = "Custom server — key optional."; el.style.color = "var(--dim)"; return; }
+  if (k) { el.textContent = `✓ Key saved (${k.slice(0, 7)}…${k.slice(-4)}, ${k.length} chars). Tap Test key to check it.`; el.style.color = "var(--ok)"; }
+  else { el.textContent = "✗ No key saved yet. Paste it above, then tap Save key."; el.style.color = "var(--danger)"; }
 }
 $("provider").onchange = e => { settings.provider = e.target.value; modelCache = []; saveSettings(); fillSettings(); renderHeader(); };
 $("baseUrl").oninput = e => { settings.baseUrl = e.target.value.trim(); saveSettings(); };
-// Save the key on every keystroke/paste (iOS Safari may not fire 'change' before the drawer closes).
-$("apiKey").oninput = e => { const was = !!apiKey(); settings.keys[settings.provider] = e.target.value.trim(); saveSettings(); renderHeader(); if (!was && apiKey()) toast("Key saved on this phone"); };
+// Save on every keystroke/paste (belt), and on the explicit button (suspenders) for flaky iOS events.
+function commitKey() { settings.keys[settings.provider] = $("apiKey").value.trim(); saveSettings(); renderHeader(); renderKeyStatus(); }
+$("apiKey").oninput = commitKey;
+$("apiKey").onchange = commitKey;
+$("saveKey").onclick = () => { commitKey(); toast(apiKey() ? "Key saved ✓" : "Box is empty — paste the key first"); };
+$("testKey").onclick = async () => {
+  commitKey();
+  if (!apiKey() && settings.provider !== "custom") return toast("No key to test — paste it first");
+  $("keyStatus").textContent = "Testing…"; $("keyStatus").style.color = "var(--dim)";
+  try {
+    const r = await fetch(baseUrl() + "/models", { headers: apiKey() ? { Authorization: "Bearer " + apiKey() } : {} });
+    if (r.ok) { $("keyStatus").textContent = "✓ Key works. You're ready — close this and send a message."; $("keyStatus").style.color = "var(--ok)"; toast("Key works ✓"); }
+    else { let m = await r.text(); try { m = JSON.parse(m).error?.message || m; } catch {} $("keyStatus").textContent = `✗ Key rejected (${r.status}): ${m.slice(0,140)}`; $("keyStatus").style.color = "var(--danger)"; }
+  } catch (err) { $("keyStatus").textContent = "✗ Couldn't reach the service: " + err.message; $("keyStatus").style.color = "var(--danger)"; }
+};
 $("model").oninput = e => { settings.models[settings.provider] = e.target.value.trim(); saveSettings(); renderHeader(); };
 $("aboutMe").oninput = e => { settings.aboutMe = e.target.value; saveSettings(); };
 $("temp").oninput = e => { settings.temperature = +e.target.value; $("tempVal").textContent = e.target.value; saveSettings(); };
