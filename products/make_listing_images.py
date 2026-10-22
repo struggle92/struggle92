@@ -103,3 +103,31 @@ im.paste(tr, (1080, y + 40))
 badge(d, "$24")
 im.save("bundle/listing_cover.png")
 print("done")
+
+# --- Shorts playbook ---
+pb = "shorts-playbook/Faceless_Shorts_Playbook.pdf"
+im, d, y = base("TIKTOK • YOUTUBE SHORTS • REELS", ["Faceless Shorts", "Playbook"], "Post every day without showing your face.")
+for i, t in enumerate(thumbs(pb, [1, 4, 8], 540)):
+    im.paste(t.crop((0, 0, t.width, min(t.height, 700))), (120 + i * 600, y + 40))
+d.text((120, y + 790), "60 hooks  •  5 formats  •  30-day calendar", font=f(B, 50), fill=(255, 255, 255))
+badge(d, "PDF + 2")
+im.save("shorts-playbook/listing_cover.png")
+
+# --- No-Pick routine (rose palette to match the skincare line) ---
+ROSE, PLUM = (201, 139, 154), (110, 90, 126)
+im = Image.new("RGB", (2000, 2000), ROSE)
+d = ImageDraw.Draw(im)
+d.text((120, 120), "PRINTABLE  •  GOES WITH YOUR PATCHES", font=f(B, 46), fill=(255, 255, 255))
+d.text((120, 210), "The No-Pick", font=f(B, 132), fill=(255, 255, 255))
+d.text((120, 360), "Night Routine", font=f(B, 132), fill=(255, 255, 255))
+d.rectangle([120, 530, 360, 544], fill=PLUM)
+d.text((120, 580), "+ 30-day tracker. 5 minutes a night.", font=f(R, 52), fill=(255, 255, 255))
+for i, t in enumerate(thumbs("no-pick-routine/No_Pick_Night_Routine.pdf", [2, 4, 5], 540)):
+    im.paste(t.crop((0, 0, t.width, min(t.height, 700))), (120 + i * 600, 700))
+d.text((120, 1490), "Routine  •  2-week no-pick plan  •  patch guide", font=f(B, 50), fill=(255, 255, 255))
+d.rounded_rectangle([1420, 1740, 1880, 1880], 30, fill=PLUM)
+w = d.textlength("5 PAGES", font=f(B, 58))
+d.text((1650 - w / 2, 1775), "5 PAGES", font=f(B, 58), fill=(255, 255, 255))
+d.text((120, 1900), "Cosmetic routine guide, not medical advice.", font=f(R, 34), fill=(250, 235, 240))
+im.save("no-pick-routine/listing_cover.png")
+print("done extra")
