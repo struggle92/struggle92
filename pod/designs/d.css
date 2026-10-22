@@ -1,0 +1,13 @@
+@font-face{font-family:Anton;src:url(../fonts/Anton.ttf)}
+@font-face{font-family:Bebas;src:url(../fonts/BebasNeue.ttf)}
+@font-face{font-family:Pacifico;src:url(../fonts/Pacifico.ttf)}
+@font-face{font-family:Marker;src:url(../fonts/PermanentMarker.ttf)}
+@font-face{font-family:Archivo;src:url(../fonts/ArchivoBlack.ttf)}
+@font-face{font-family:Caveat;src:url(../fonts/Caveat.ttf)}
+@font-face{font-family:Playfair;src:url(../fonts/PlayfairDisplay.ttf);font-weight:900}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1500px;height:1800px;background:transparent}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ink);padding:80px}
+.dark{--ink:#1d2433;--acc:#3a7bd5;--soft:#5b6478}
+.light{--ink:#ffffff;--acc:#8ec5ff;--soft:#c9d3e6}
+svg{display:block}

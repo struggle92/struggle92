@@ -1,0 +1,23 @@
+@font-face{font-family:Bebas;src:url(BebasNeue.ttf)}
+@font-face{font-family:Caveat;src:url(Caveat.ttf)}
+@font-face{font-family:Playfair;src:url(PlayfairDisplay.ttf);font-weight:900}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Liberation Sans",Arial,sans-serif;color:#2b2b2b;font-size:10pt}
+.pg{page-break-after:always;height:calc(100vh);padding:0;display:flex;flex-direction:column}
+.pg:last-child{page-break-after:auto}
+h1{font:400 34pt/1 Bebas;letter-spacing:3px;color:var(--a)}
+.sub{font:400 15pt Caveat;color:#777;margin:2px 0 12px}
+.row{display:flex;gap:14px}
+.col{flex:1;display:flex;flex-direction:column}
+.box{border:1.5px solid var(--a);border-radius:10px;padding:8px 10px;margin-bottom:12px;flex:1;display:flex;flex-direction:column}
+.box h3{font:400 14pt Bebas;letter-spacing:2px;color:var(--a);margin-bottom:4px}
+.ln{border-bottom:1px solid #cfcfcf;flex:1;min-height:20px}
+table{width:100%;border-collapse:collapse}
+th{font:400 11pt Bebas;letter-spacing:1.5px;background:var(--bg);color:var(--a);padding:5px;border:1px solid #d5d5d5;text-align:left}
+td{border:1px solid #d5d5d5;height:var(--rh,24px);padding:2px 5px}
+.grid7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;flex:1}
+.cell{border:1.5px solid var(--a);border-radius:8px;padding:5px;font:400 12pt Bebas;color:var(--a)}
+.cover{justify-content:center;align-items:center;text-align:center;background:var(--bg);border-radius:24px}
+.cover h1{font:900 44pt/1.05 Playfair;color:#2b2b2b;letter-spacing:0}
+.chk{display:inline-block;width:12px;height:12px;border:1.5px solid var(--a);border-radius:3px;margin-right:6px;vertical-align:middle}
+.foot{font-size:7pt;color:#aaa;text-align:center;margin-top:4px}
