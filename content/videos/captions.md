@@ -1,6 +1,6 @@
 # Week 1 captions (post 1 a day, add a trending sound in the app)
 
-Link in bio: https://qfs1-store.myshopify.com/products/the-marketplace-flipper-kit-25-listing-templates-30-buyer-scripts-pdf
+Link in bio: https://qfs1-store.myshopify.com/collections/side-hustle-tools
 
 | Day | Video | Caption |
 |---|---|---|

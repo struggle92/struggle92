@@ -1,6 +1,6 @@
 # Community & text-platform posts
 
-Store: https://qfs1-store.myshopify.com
+Store: https://qfs1-store.myshopify.com/collections/side-hustle-tools
 
 **Rules that keep accounts from getting banned**
 - Read each subreddit's / group's rules first. Many ban links or self-promotion outright.
@@ -51,7 +51,7 @@ Store: https://qfs1-store.myshopify.com
 > 8 photos that sell on Marketplace: 1) whole item in daylight 2) 45° angle 3) brand label 4) it working 5) tape measure for size 6) details/extras 7) every flaw 8) everything together. Fewer questions, faster sales.
 
 **Post 3: soft offer (only in groups that allow promo days)**
-> I put my listing templates, buyer reply scripts and sourcing checklist into a 14-page kit for anyone starting out. It's $12 here: https://qfs1-store.myshopify.com. Happy to answer flipping questions in the comments either way.
+> I put my listing templates, buyer reply scripts and sourcing checklist into a 14-page kit for anyone starting out. It's $12 here: https://qfs1-store.myshopify.com/collections/side-hustle-tools. Happy to answer flipping questions in the comments either way.
 
 ---
 
@@ -68,7 +68,7 @@ Store: https://qfs1-store.myshopify.com
 **Post 2**
 > Most side hustlers don't know their real profit.
 > Gross minus platform fees, minus supplies, minus mileage, minus what you owe in taxes. Do that math once and it changes what you're willing to spend your time on.
-> I made a spreadsheet that does it automatically (Excel + Google Sheets): https://qfs1-store.myshopify.com
+> I made a spreadsheet that does it automatically (Excel + Google Sheets): https://qfs1-store.myshopify.com/collections/side-hustle-tools
 
 **Post 3**
 > Small business lesson from flipping furniture: the money is made when you buy, not when you sell.
@@ -87,4 +87,4 @@ Store: https://qfs1-store.myshopify.com
 7. Listing title formula: Brand + Item + Key feature + Condition. Nobody searches "Dresser."
 8. Unsold inventory is cash you can't use. Sell before you buy more.
 9. No messages in 3 days: new first photo. No sale in 7 days: drop 10% and renew.
-10. Tools I made for flipping and tracking side hustle money: qfs1-store.myshopify.com
+10. Tools I made for flipping and tracking side hustle money: qfs1-store.myshopify.com/collections/side-hustle-tools
