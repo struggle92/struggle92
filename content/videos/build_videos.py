@@ -18,6 +18,8 @@ SAFE_L, SAFE_R, SAFE_T, SAFE_B = 90, W - 170, 300, H - 480  # text box inside sa
 
 KIT = ROOT / "products/flipper-kit/listing_cover.png"
 TRACKER = ROOT / "products/profit-tracker/listing_cover.png"
+PLANNER = ROOT / "products/money-planner/listing_cover.png"
+BUNDLE = ROOT / "products/bundle/listing_cover.png"
 
 # (file, slides[(kind, text, seconds)], end-card product, end-card line)
 VIDEOS = [
@@ -67,6 +69,146 @@ VIDEOS = [
         ("beat", "Never send any code to a buyer. Ever.", 2.8),
         ("beat", "Share this with someone who sells online.", 2.6),
     ], KIT, "Scam red flags + safe meetups in the Flipper Kit"),
+]
+
+VIDEOS += [
+    # ---- Week 2: the tracker ----
+    ("day08_where_money_went", [
+        ("hook", "I thought my side hustle was making money", 2.8),
+        ("beat", "Then I tracked the fees, the gas and the supplies.", 2.8),
+        ("beat", "Real profit was way less.", 2.2),
+        ("beat", "Now every number goes in one sheet that does the math for me.", 3.2),
+    ], TRACKER, "Side Hustle Profit Tracker (Excel + Google Sheets)"),
+    ("day09_flip_roi", [
+        ("hook", "Which flips are actually worth it?", 2.6),
+        ("quote", "Example: bought $25 + $18 paint, sold $125", 3.2),
+        ("list", "Profit: $82\nROI: 191%\nSold in: 9 days", 3.2),
+        ("beat", "The tracker works it out the second you type the sold price.", 3.0),
+    ], TRACKER, "Flip tracker included in the Profit Tracker"),
+    ("day10_subscription_audit", [
+        ("hook", "Add up your subscriptions. I'll wait.", 2.6),
+        ("beat", "List every recurring charge.", 2.2),
+        ("beat", "See what each one costs per YEAR.", 2.4),
+        ("beat", "Mark the ones you don't use. Cancel them today.", 2.8),
+        ("beat", "Do this once a month.", 2.0),
+    ], TRACKER, "Subscription audit in the Profit Tracker"),
+    ("day11_tax_set_aside", [
+        ("hook", "Your side hustle money isn't all yours", 2.6),
+        ("beat", "Side hustle income is taxable.", 2.2),
+        ("beat", "Move a set % of profit into savings every month.", 2.8),
+        ("beat", "No surprise bill in April.", 2.2),
+        ("beat", "Not tax advice. Ask a tax pro what % fits you.", 2.8),
+    ], TRACKER, "Monthly tax set-aside in the Profit Tracker"),
+    ("day12_mileage", [
+        ("hook", "Driving for your hustle? Log every mile.", 2.6),
+        ("beat", "Pickups. Post office. Deliveries. Supply runs.", 2.8),
+        ("beat", "Write down the odometer before and after.", 2.6),
+        ("beat", "Business miles may be deductible. Ask a tax pro what you can claim.", 3.4),
+    ], TRACKER, "Mileage log in the Profit Tracker"),
+    ("day13_google_sheets", [
+        ("hook", "Track your hustle from your phone. Free.", 2.6),
+        ("beat", "Upload the tracker to Google Drive once.", 2.4),
+        ("beat", "Open it in Google Sheets on your phone.", 2.4),
+        ("beat", "Log a sale in the parking lot, right after pickup.", 2.8),
+    ], TRACKER, "Works in Excel and Google Sheets"),
+    ("day14_sunday_routine", [
+        ("hook", "My 10-minute Sunday money routine", 2.6),
+        ("list", "1. Log income\n2. Log expenses\n3. Mark sold flips\n4. Check the dashboard\n5. Move the tax money", 4.4),
+        ("beat", "10 minutes. Every week. That's it.", 2.4),
+    ], TRACKER, "Side Hustle Profit Tracker"),
+    # ---- Week 3: flipping habits ----
+    ("day15_start_with_zero", [
+        ("hook", "No money to start flipping? Start here.", 2.6),
+        ("beat", "Walk around your house.", 2.0),
+        ("beat", "Find 10 things you don't use.", 2.2),
+        ("beat", "List them tonight with good photos and a real title.", 2.8),
+        ("beat", "That money buys your first flip.", 2.4),
+    ], KIT, "25 listing templates in the Flipper Kit"),
+    ("day16_relist_rules", [
+        ("hook", "It didn't sell. Here's what to change.", 2.6),
+        ("beat", "No messages in 3 days → new first photo.", 2.8),
+        ("beat", "No sale in 7 days → drop 10% and renew.", 2.8),
+        ("beat", "Most items move after one fix.", 2.4),
+    ], KIT, "Relist rules in the Flipper Kit"),
+    ("day17_no_show", [
+        ("hook", "Buyer didn't show? Send this.", 2.4),
+        ("quote", "\"No worries! I'm offering it to the next person. Message me if you still want it.\"", 4.2),
+        ("beat", "Then message the next person in line. Don't wait around.", 3.0),
+    ], KIT, "30 buyer scripts in the Flipper Kit"),
+    ("day18_safe_meetups", [
+        ("hook", "Where to meet every Marketplace buyer", 2.6),
+        ("beat", "A police station safe exchange zone, or a busy parking lot.", 3.0),
+        ("beat", "Daylight.", 1.6),
+        ("beat", "Big items stay on the porch. Someone home with you.", 2.8),
+        ("beat", "Trust your gut. Cancel if it feels off.", 2.4),
+    ], KIT, "Safe meetup rules in the Flipper Kit"),
+    ("day19_garage_sales", [
+        ("hook", "Go to garage sales twice", 2.2),
+        ("beat", "Early: the best stuff.", 2.0),
+        ("beat", "Late: the best prices.", 2.0),
+        ("quote", "\"What do you want for this whole table?\"", 3.0),
+        ("beat", "They don't want to carry it back inside.", 2.4),
+    ], KIT, "Full sourcing guide in the Flipper Kit"),
+    ("day20_what_to_avoid", [
+        ("hook", "Don't flip these", 2.0),
+        ("list", "• Recalled items (check cpsc.gov)\n• Car seats\n• Stained mattresses\n• Fake brand-name stuff\n• Anything you can't test", 4.6),
+        ("beat", "Not worth the risk.", 2.0),
+    ], KIT, "What to avoid: in the Flipper Kit"),
+    ("day21_hold_request", [
+        ("hook", "\"Can you hold it for me?\"", 2.4),
+        ("quote", "\"I don't hold items without a pickup time, sorry! When could you come?\"", 4.0),
+        ("beat", "No time = no hold. The first person to show up gets it.", 2.8),
+    ], KIT, "30 buyer scripts in the Flipper Kit"),
+    # ---- Week 4: money habits + selling ----
+    ("day22_budget_3_numbers", [
+        ("hook", "Your whole budget is 3 numbers", 2.4),
+        ("list", "1. What came in\n2. What went out\n3. What's left", 3.4),
+        ("beat", "Know these every week and you're ahead of most people.", 3.0),
+    ], PLANNER, "Hustle Money Planner ($4.99 printable)"),
+    ("day23_fees_eat_profit", [
+        ("hook", "That $50 sale wasn't $50", 2.4),
+        ("beat", "Platform fees. Shipping. Gas to get there.", 2.6),
+        ("beat", "Log gross and fees separately.", 2.4),
+        ("beat", "Then you'll see what you really keep.", 2.4),
+    ], TRACKER, "Side Hustle Profit Tracker"),
+    ("day24_money_tied_up", [
+        ("hook", "Unsold stuff is cash you can't use", 2.6),
+        ("beat", "Add up what you paid for everything still in your garage.", 3.0),
+        ("beat", "That's money tied up.", 2.0),
+        ("beat", "Sell before you buy more.", 2.2),
+    ], TRACKER, "Profit Tracker shows money tied up"),
+    ("day25_monthly_goal", [
+        ("hook", "Set a monthly profit goal. Watch it.", 2.6),
+        ("beat", "Pick one number for the month.", 2.2),
+        ("beat", "Check your progress every Sunday.", 2.4),
+        ("beat", "A goal you can see is a goal you hit.", 2.4),
+    ], TRACKER, "Goal tracking in the Profit Tracker"),
+    ("day26_bundle", [
+        ("hook", "Everything to flip and track your money, in one download", 3.0),
+        ("list", "• Flipper Kit: templates + scripts\n• Profit Tracker: auto math\n• Money Planner: budget", 4.0),
+        ("beat", "All 3 for $24.", 2.2),
+    ], BUNDLE, "Side Hustle Money Kit: all 3 for $24"),
+    ("day27_fill_in_template", [
+        ("hook", "List any item in under 2 minutes", 2.6),
+        ("list", "1. Take 8 photos\n2. Paste the template\n3. Fill in the [brackets]\n4. Post", 3.8),
+        ("beat", "No staring at a blank box.", 2.2),
+    ], KIT, "25 listing templates in the Flipper Kit"),
+    ("day28_haggle_at_pickup", [
+        ("hook", "They tried to haggle at pickup", 2.4),
+        ("quote", "\"We agreed on $___ in messages. That's the price. If it doesn't work, no problem.\"", 4.2),
+        ("beat", "Say it calmly. Then stop talking.", 2.4),
+    ], KIT, "30 buyer scripts in the Flipper Kit"),
+    ("day29_fake_payment_email", [
+        ("hook", "Got a \"payment pending\" email from a buyer?", 2.8),
+        ("beat", "Payment apps don't email you to \"unlock\" money.", 2.8),
+        ("beat", "Only trust your actual app balance.", 2.4),
+        ("beat", "No money in the app = no item.", 2.4),
+    ], KIT, "Scam red flags in the Flipper Kit"),
+    ("day30_price_drop_message", [
+        ("hook", "Lowered your price? Send this.", 2.4),
+        ("quote", "\"Hi! You asked about the ___ earlier. I dropped it to $___. Still interested?\"", 4.0),
+        ("beat", "The people who asked before are your warmest buyers.", 2.8),
+    ], KIT, "30 buyer scripts in the Flipper Kit"),
 ]
 
 
@@ -143,9 +285,10 @@ def end_frame(cover, line, t):
     im, d = base(SAGE_DK)
     e = 1 - (1 - min(1, t)) ** 3
     size = 760
-    c = Image.open(cover).convert("RGB").resize((size, size))
+    c = Image.open(cover).convert("RGB")
+    c.thumbnail((size, size))  # keep aspect ratio (the planner cover is portrait)
     y = 360 + int((1 - e) * 80)
-    im.paste(c, ((W - size) // 2 - 40, y))
+    im.paste(c, ((W - c.width) // 2 - 40, y + (size - c.height) // 2))
     f = font(BOLD, 58)
     for i, ln in enumerate(wrap(d, line, f, SAFE_R - SAFE_L)):
         d.text((SAFE_L, y + size + 60 + i * 74), ln, font=f, fill=(255, 255, 255))

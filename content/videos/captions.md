@@ -13,3 +13,7 @@ Link in bio: https://qfs1-store.myshopify.com/products/the-marketplace-flipper-k
 | 7 | day07_code_scam.mp4 | Share this with someone who sells on Marketplace. #scamalert #facebookmarketplace #staysafe |
 
 Rebuild or add videos: edit VIDEOS in build_videos.py, then `python3 build_videos.py`.
+
+## Weeks 2-4 (scheduled Oct 30 - Nov 21, 10:00 AM ET)
+Days 8-14 promote the Profit Tracker, 15-21 and 27-30 the Flipper Kit, 22 the Money Planner, 23-25 the Tracker, 26 the bundle.
+Captions are in the Metricool planner. Scripts that needed real sales numbers (weekly recap, 30-day recap) were swapped for tips, so no video shows invented results.
